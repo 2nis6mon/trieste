@@ -1,0 +1,319 @@
+{
+ "parquet": {
+  "size_m": 2.56,
+  "maps": [
+   "parquet",
+   "parquet_n",
+   "parquet_r"
+  ]
+ },
+ "enduit": {
+  "size_m": 1.0,
+  "maps": [
+   "enduit",
+   "enduit_n"
+  ]
+ },
+ "bouleau": {
+  "size_m": 0.6,
+  "maps": [
+   "bouleau",
+   "bouleau_n"
+  ]
+ },
+ "chene": {
+  "size_m": 0.8,
+  "maps": [
+   "chene",
+   "chene_n"
+  ]
+ },
+ "bambou": {
+  "size_m": 0.4,
+  "maps": [
+   "bambou",
+   "bambou_n"
+  ]
+ },
+ "lin": {
+  "size_m": 0.12,
+  "maps": [
+   "lin",
+   "lin_n"
+  ]
+ },
+ "nalbjornbar": {
+  "size_m": 0.5,
+  "maps": [
+   "nalbjornbar"
+  ]
+ },
+ "tissu_canape": {
+  "size_m": 0.1,
+  "maps": [
+   "tissu_canape",
+   "tissu_canape_n"
+  ]
+ },
+ "tapis_chambre": {
+  "size_m": 0.35,
+  "maps": [
+   "tapis_chambre",
+   "tapis_chambre_n"
+  ]
+ },
+ "tapis_sejour": {
+  "size_m": 0.25,
+  "maps": [
+   "tapis_sejour",
+   "tapis_sejour_n"
+  ]
+ },
+ "plaid": {
+  "size_m": 0.12,
+  "maps": [
+   "plaid",
+   "plaid_n"
+  ]
+ },
+ "eponge": {
+  "size_m": 0.08,
+  "maps": [
+   "eponge",
+   "eponge_n"
+  ]
+ },
+ "cannage": {
+  "size_m": 0.036,
+  "maps": [
+   "cannage",
+   "cannage_n"
+  ],
+  "alpha": true
+ },
+ "carrelage": {
+  "size_m": 1.2,
+  "maps": [
+   "carrelage",
+   "carrelage_n"
+  ]
+ },
+ "terrasse": {
+  "size_m": 1.2,
+  "maps": [
+   "terrasse",
+   "terrasse_n"
+  ]
+ },
+ "terracotta": {
+  "size_m": 0.5,
+  "maps": [
+   "terracotta"
+  ]
+ },
+ "brosse": {
+  "size_m": 0.2,
+  "maps": [
+   "brosse_r",
+   "brosse_n"
+  ]
+ },
+ "affiche_arche": {
+  "size_m": [
+   0.3,
+   0.4
+  ],
+  "maps": [
+   "affiche_arche"
+  ],
+  "kind": "art"
+ },
+ "affiche_feuille": {
+  "size_m": [
+   0.3,
+   0.4
+  ],
+  "maps": [
+   "affiche_feuille"
+  ],
+  "kind": "art"
+ },
+ "affiche_cercles": {
+  "size_m": [
+   0.3,
+   0.4
+  ],
+  "maps": [
+   "affiche_cercles"
+  ],
+  "kind": "art"
+ },
+ "affiche_formes": {
+  "size_m": [
+   0.3,
+   0.4
+  ],
+  "maps": [
+   "affiche_formes"
+  ],
+  "kind": "art"
+ },
+ "affiche_bouquet": {
+  "size_m": [
+   0.3,
+   0.4
+  ],
+  "maps": [
+   "affiche_bouquet"
+  ],
+  "kind": "art"
+ },
+ "affiche_soleil": {
+  "size_m": [
+   0.3,
+   0.4
+  ],
+  "maps": [
+   "affiche_soleil"
+  ],
+  "kind": "art"
+ },
+ "feuilles": {
+  "size_m": 1.0,
+  "maps": [
+   "feuilles"
+  ],
+  "alpha": true,
+  "cells": {
+   "olive": [
+    0.0,
+    0.5,
+    0.25,
+    1.0
+   ],
+   "euca": [
+    0.25,
+    0.5,
+    0.5,
+    1.0
+   ],
+   "pothos": [
+    0.5,
+    0.5,
+    0.75,
+    1.0
+   ],
+   "basil": [
+    0.75,
+    0.5,
+    1.0,
+    1.0
+   ],
+   "ficus": [
+    0.0,
+    0.0,
+    0.25,
+    0.5
+   ],
+   "herb": [
+    0.25,
+    0.0,
+    0.5,
+    0.5
+   ]
+  }
+ },
+ "terreau": {
+  "size_m": 0.2,
+  "maps": [
+   "terreau"
+  ]
+ },
+ "gres": {
+  "size_m": 0.3,
+  "maps": [
+   "gres",
+   "gres_n"
+  ]
+ },
+ "facade_est": {
+  "size_m": [
+   18.2,
+   23.099999999999998
+  ],
+  "maps": [
+   "facade_est"
+  ],
+  "kind": "facade"
+ },
+ "facade_nord": {
+  "size_m": [
+   15.600000000000001,
+   23.099999999999998
+  ],
+  "maps": [
+   "facade_nord"
+  ],
+  "kind": "facade"
+ },
+ "facade_sud": {
+  "size_m": [
+   18.2,
+   23.099999999999998
+  ],
+  "maps": [
+   "facade_sud"
+  ],
+  "kind": "facade"
+ },
+ "facade_ouest": {
+  "size_m": [
+   15.600000000000001,
+   23.099999999999998
+  ],
+  "maps": [
+   "facade_ouest"
+  ],
+  "kind": "facade"
+ },
+ "facade_est_nuit": {
+  "size_m": [
+   18.2,
+   23.099999999999998
+  ],
+  "maps": [
+   "facade_est_nuit"
+  ],
+  "kind": "facade_emissive"
+ },
+ "facade_nord_nuit": {
+  "size_m": [
+   15.600000000000001,
+   23.099999999999998
+  ],
+  "maps": [
+   "facade_nord_nuit"
+  ],
+  "kind": "facade_emissive"
+ },
+ "facade_sud_nuit": {
+  "size_m": [
+   18.2,
+   23.099999999999998
+  ],
+  "maps": [
+   "facade_sud_nuit"
+  ],
+  "kind": "facade_emissive"
+ },
+ "facade_ouest_nuit": {
+  "size_m": [
+   15.600000000000001,
+   23.099999999999998
+  ],
+  "maps": [
+   "facade_ouest_nuit"
+  ],
+  "kind": "facade_emissive"
+ }
+}
