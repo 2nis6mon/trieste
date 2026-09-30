@@ -50,4 +50,6 @@ d'affichage, très lente en rendu logiciel.
   graphique le rendu est identique mais fluide.
 - Pas de test sur un iPhone réel (émulation Chromium uniquement).
 - Bruit résiduel de précalcul (marbrures légères) sur les grandes surfaces
-  blanches (façades du placard, tableaux des fenêtres).
+  blanches (façades du placard, tableaux des fenêtres), réduit par les
+  portails de lumière mais encore visible de près.
+- La salle de bain (pièce aveugle) reste assez sombre en mode jour.
