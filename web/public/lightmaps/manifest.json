@@ -10,33 +10,34 @@
   "atlas": {
    "chambre": {
     "file": "lightmaps/jour/chambre.webp",
-    "intensity": 0.8440879881381985
+    "intensity": 0.8344505384564398
    },
    "cuisine": {
     "file": "lightmaps/jour/cuisine.webp",
-    "intensity": 0.366563825309277
+    "intensity": 0.3667864764109259
    },
    "sejour": {
     "file": "lightmaps/jour/sejour.webp",
-    "intensity": 2.8776252195239276
+    "intensity": 2.856403824687007
    },
    "sdb": {
     "file": "lightmaps/jour/sdb.webp",
-    "intensity": 0.8032414659857744
+    "intensity": 0.795024288445711
    },
    "ext": {
     "file": "lightmaps/jour/ext.webp",
-    "intensity": 52.78077909946445
+    "intensity": 52.40282013416291
    },
    "archi": {
     "file": "lightmaps/jour/archi.webp",
-    "intensity": 5.737598061561606
+    "intensity": 5.8510989010334065
    },
    "sas": {
     "file": "lightmaps/jour/sas.webp",
-    "intensity": 24.23490393161798
+    "intensity": 24.119292736053485
    }
-  }
+  },
+  "log_k": 1024.0
  },
  "soir": {
   "info": {
@@ -49,33 +50,34 @@
   "atlas": {
    "chambre": {
     "file": "lightmaps/soir/chambre.webp",
-    "intensity": 0.6752688787877557
+    "intensity": 0.678721735626458
    },
    "cuisine": {
     "file": "lightmaps/soir/cuisine.webp",
-    "intensity": 0.3875318612903366
+    "intensity": 0.3939656767994174
    },
    "sejour": {
     "file": "lightmaps/soir/sejour.webp",
-    "intensity": 2.9782165572047274
+    "intensity": 2.9689322352409455
    },
    "sdb": {
     "file": "lightmaps/soir/sdb.webp",
-    "intensity": 0.8104759402573108
+    "intensity": 0.803566413372755
    },
    "ext": {
     "file": "lightmaps/soir/ext.webp",
-    "intensity": 26.908398413658144
+    "intensity": 26.866759383678442
    },
    "archi": {
     "file": "lightmaps/soir/archi.webp",
-    "intensity": 5.089837396144868
+    "intensity": 5.201139885187185
    },
    "sas": {
     "file": "lightmaps/soir/sas.webp",
-    "intensity": 24.448381066322376
+    "intensity": 23.98645889759065
    }
-  }
+  },
+  "log_k": 1024.0
  },
  "nuit": {
   "info": {
@@ -84,33 +86,34 @@
   "atlas": {
    "chambre": {
     "file": "lightmaps/nuit/chambre.webp",
-    "intensity": 1.5870181739330054
+    "intensity": 1.6405074894428155
    },
    "cuisine": {
     "file": "lightmaps/nuit/cuisine.webp",
-    "intensity": 3.7448772817850164
+    "intensity": 3.736038158833982
    },
    "sejour": {
     "file": "lightmaps/nuit/sejour.webp",
-    "intensity": 2.5785237416625173
+    "intensity": 2.5585091069340873
    },
    "sdb": {
     "file": "lightmaps/nuit/sdb.webp",
-    "intensity": 0.15961929876357303
+    "intensity": 0.16083222944289394
    },
    "ext": {
     "file": "lightmaps/nuit/ext.webp",
-    "intensity": 0.14353532521054194
+    "intensity": 0.13843614882789562
    },
    "archi": {
     "file": "lightmaps/nuit/archi.webp",
-    "intensity": 0.9116386037319901
+    "intensity": 0.9097179196775051
    },
    "sas": {
     "file": "lightmaps/nuit/sas.webp",
-    "intensity": 0.03851298976223918
+    "intensity": 0.03580747533123943
    }
-  }
+  },
+  "log_k": 1024.0
  },
  "nuit_plafonniers": {
   "info": {
@@ -119,32 +122,33 @@
   "atlas": {
    "chambre": {
     "file": "lightmaps/nuit_plafonniers/chambre.webp",
-    "intensity": 2.8217839986085846
+    "intensity": 2.753771483898154
    },
    "cuisine": {
     "file": "lightmaps/nuit_plafonniers/cuisine.webp",
-    "intensity": 6.347791129350668
+    "intensity": 6.2613797992467894
    },
    "sejour": {
     "file": "lightmaps/nuit_plafonniers/sejour.webp",
-    "intensity": 10.17783991694451
+    "intensity": 9.788897109031678
    },
    "sdb": {
     "file": "lightmaps/nuit_plafonniers/sdb.webp",
-    "intensity": 0.8675511553883553
+    "intensity": 0.8552081674337384
    },
    "ext": {
     "file": "lightmaps/nuit_plafonniers/ext.webp",
-    "intensity": 0.21349933119490835
+    "intensity": 0.21056067738682047
    },
    "archi": {
     "file": "lightmaps/nuit_plafonniers/archi.webp",
-    "intensity": 3.8244870394468333
+    "intensity": 3.826651495695121
    },
    "sas": {
     "file": "lightmaps/nuit_plafonniers/sas.webp",
-    "intensity": 24.19125449657468
+    "intensity": 24.212951064109856
    }
-  }
+  },
+  "log_k": 1024.0
  }
 }
