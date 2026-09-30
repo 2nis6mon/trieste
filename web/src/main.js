@@ -37,7 +37,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, touch ? 1.6 : 2));
 renderer.toneMapping = THREE.AgXToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 const camera = new THREE.PerspectiveCamera(50, 1, 0.05, 900);
 const apt = new Apartment(renderer);

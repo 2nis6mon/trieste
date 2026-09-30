@@ -15,7 +15,7 @@
   "chrome":         {"color": "#f4f4f4", "metalness": 1.0, "roughness": 0.07, "lit": "probe"},
   "inox":           {"color": "#e6e4e0", "metalness": 1.0, "roughness": 0.3, "roughnessMap": "brosse_r", "normalMap": "brosse_n", "normalScale": 0.2, "size": 0.2, "side": "double", "lit": "probe"},
   "laiton":         {"color": "#d7b77a", "metalness": 1.0, "roughness": 0.28, "lit": "probe"},
-  "verre":          {"color": "#ffffff", "lit": "glass", "opacity": 0.1, "roughness": 0.02},
+  "verre":          {"color": "#0d1110", "lit": "glass", "opacity": 0.14, "roughness": 0.02},
   "verre_extra":    {"color": "#f4fbf8", "lit": "glass", "opacity": 0.14, "roughness": 0.02},
   "miroir":         {"color": "#ffffff", "lit": "mirror"},
 
