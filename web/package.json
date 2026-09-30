@@ -7,7 +7,7 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview --host",
-    "optimize": "gltf-transform draco public/models/appartement.glb public/models/appartement.glb --quantize-position 16 --quantize-texcoord 14 --quantize-normal 10",
+    "optimize": "gltf-transform draco public/models/appartement.glb public/models/appartement.glb --quantize-position 16 --quantize-texcoord 14 --quantize-normal 10 --quantization-volume scene",
     "captures": "node scripts/captures.mjs http://localhost:5173/ ../docs/captures",
     "verifier": "node scripts/verifier.mjs http://localhost:5173/"
   },

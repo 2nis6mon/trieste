@@ -11,7 +11,9 @@ const SUN_COLOR = { jour: [1.0, 0.975, 0.93], soir: [1.0, 0.7, 0.43] };
 const K_POINT = 1 / (4 * Math.PI);
 const K_AREA = 1 / Math.PI;
 // Hauteur de l'ampoule au-dessus du point d'export (le pied de la lampe)
-const LIFT = { lampadaire_lum: 1.43, lampe_chevet_1_lum: 0.19, lampe_chevet_2_lum: 0.19, lampe_tv_lum: 0.19 };
+const LIFT = { lampadaire_lum: 1.43, lampe_chevet_1_lum: 0.235, lampe_chevet_2_lum: 0.235, lampe_tv_lum: 0.235 };
+// globes opale : une partie de la lumière reste dans le verre
+const GAIN = { lampe_chevet_1_lum: 0.55, lampe_chevet_2_lum: 0.55, lampe_tv_lum: 0.55 };
 
 export class Eclairage {
   constructor(apt) {
@@ -22,8 +24,8 @@ export class Eclairage {
     this.sun.shadow.mapSize.set(2048, 2048);
     const c = this.sun.shadow.camera;
     c.left = -8; c.right = 8; c.top = 8; c.bottom = -8; c.near = 1; c.far = 60;
-    this.sun.shadow.bias = -0.0004;
-    this.sun.shadow.normalBias = 0.02;
+    this.sun.shadow.bias = -0.0008;
+    this.sun.shadow.normalBias = 0.05;
     this.sun.target.position.set(4.6, 1.0, 7.2);
     this.scene.add(this.sun, this.sun.target);
     this.lamps = [];
@@ -31,7 +33,7 @@ export class Eclairage {
       let light;
       const col = new THREE.Color(...l.color);
       if (l.type === 'POINT') {
-        light = new THREE.PointLight(col, l.power * K_POINT, 6, 2);
+        light = new THREE.PointLight(col, l.power * K_POINT * (GAIN[l.name] || 1), 6, 2);
         light.shadow.mapSize.set(512, 512);
         light.shadow.bias = -0.002;
         light.shadow.radius = 4;
@@ -46,12 +48,14 @@ export class Eclairage {
         this.scene.add(tgt);
         light.target = tgt;
       }
+      light.shadow.camera.near = 0.02; // le globe de la lampe est à quelques cm de l'ampoule
       light.position.set(l.pos[0], l.pos[1] + (LIFT[l.name] || -0.03), l.pos[2]);
       light.visible = false;
       light.userData = { ...l };
       this.scene.add(light);
       this.lamps.push(light);
     }
+    this.buildOccluders(apt.plan);
     this.mode = 'jour';
     this.ceiling = false;
     this.room = null;
@@ -62,6 +66,34 @@ export class Eclairage {
     if (on === this.coupe) return;
     this.coupe = on;
     this.setMode(this.mode, this.ceiling);
+  }
+
+  // Volumes d'ombre pleins (invisibles) : murs du plan extrudés, allèges et
+  // impostes des baies, dalle haute. Ils remplacent la coque de l'architecture
+  // pour les ombres (ses micro-joints laissaient passer de fins traits de soleil).
+  buildOccluders(plan) {
+    const mat = new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });
+    const H = 2.70;
+    const add = (poly, y0, y1) => {
+      const sh = new THREE.Shape(poly.map(([x, z]) => new THREE.Vector2(x, -z)));
+      const g = new THREE.ExtrudeGeometry(sh, { depth: y1 - y0, bevelEnabled: false });
+      g.rotateX(-Math.PI / 2);
+      g.translate(0, y0, 0);
+      const m = new THREE.Mesh(g, mat);
+      m.castShadow = true;
+      m.userData.occluder = true;
+      this.scene.add(m);
+    };
+    for (const w of plan.walls) add(w.poly, 0, H);
+    for (const o of plan.openings) {
+      if (o.type === 'passage') { add(o.quad, o.head ?? 2.1, H); continue; }
+      if (o.sill > 0.01) add(o.quad, 0, o.sill);
+      add(o.quad, o.head ?? 2.1, H);
+      if (o.type === 'door_entry') add(o.quad, 0, H); // porte palière fermée
+    }
+    let x0 = 1e9, z0 = 1e9, x1 = -1e9, z1 = -1e9;
+    for (const w of plan.walls) for (const [x, z] of w.poly) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); z0 = Math.min(z0, z); z1 = Math.max(z1, z); }
+    add([[x0, z0], [x1, z0], [x1, z1], [x0, z1]], H, H + 0.3);
   }
 
   lampByName(name) {

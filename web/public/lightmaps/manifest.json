@@ -44,7 +44,7 @@
    "mode": "soir",
    "az": 291.75723987883083,
    "el": 11.635108877975568,
-   "E_sky": 8.431515857972974,
+   "E_sky": 8.431515857972975,
    "sun_strength": 50.58909606933594
   },
   "atlas": {
@@ -70,7 +70,7 @@
    },
    "archi": {
     "file": "lightmaps/soir/archi.webp",
-    "intensity": 5.201139885187185
+    "intensity": 5.19387829303742
    },
    "sas": {
     "file": "lightmaps/soir/sas.webp",
@@ -106,7 +106,7 @@
    },
    "archi": {
     "file": "lightmaps/nuit/archi.webp",
-    "intensity": 0.9097179196775051
+    "intensity": 1.1732862696051614
    },
    "sas": {
     "file": "lightmaps/nuit/sas.webp",

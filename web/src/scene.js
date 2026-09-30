@@ -6,7 +6,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MaterialLibrary, patchShaders } from './materials.js';
 
 export const MODES = {
-  jour: { label: 'Jour', exposure: 1.9, balance: [1.05, 1.0, 0.93], sky: [[0.42, 0.62, 0.92], [0.86, 0.9, 0.95]], skyIntensity: 3.2 },
+  jour: { label: 'Jour', exposure: 2.2, balance: [1.05, 1.0, 0.93], sky: [[0.42, 0.62, 0.92], [0.86, 0.9, 0.95]], skyIntensity: 3.2 },
   soir: { label: 'Fin de journée', exposure: 2.6, balance: [1.08, 1.0, 0.9], sky: [[0.36, 0.44, 0.66], [1.0, 0.72, 0.52]], skyIntensity: 1.6 },
   nuit: { label: 'Nuit', exposure: 1.9, balance: [1.0, 1.0, 1.0], sky: [[0.004, 0.007, 0.016], [0.05, 0.035, 0.028]], skyIntensity: 0.25 },
 };
@@ -88,7 +88,10 @@ export class Apartment {
       const spec = this.lib.specs[ud.matName];
       const room = ud.room || '';
       const specLit = spec?.lit || 'lightmap';
-      const baked = ud.atlas === 'archi' || ud.atlas === 'ext';
+      // murs intérieurs : éclairage temps réel (unis, sans marbrures) ; sols,
+      // plafonds, faïence et extérieur gardent le précalcul
+      const murs = ud.objName === 'murs';
+      const baked = (ud.atlas === 'archi' && !murs) || ud.atlas === 'ext';
       const special = ['glass', 'mirror', 'lamp', 'none'].includes(specLit) || ['lamp', 'none', 'glass'].includes(ud.lit);
       ud.realtime = !baked && !special;
       const atlas = baked && specLit === 'lightmap' ? ud.atlas : '';
@@ -103,7 +106,10 @@ export class Apartment {
       }
       o.material = m;
       if (m.userData.lit === 'glass') o.renderOrder = 2;
-      o.castShadow = m.userData.lit !== 'glass' && m.userData.lit !== 'lamp';
+      // l'architecture ne projette pas d'ombre : des volumes pleins la remplacent (eclairage.js)
+      o.castShadow = m.userData.lit !== 'glass' && m.userData.lit !== 'lamp' && ud.atlas !== 'archi' && !/^(tableau|niche)_/.test(ud.objName || '');
+      // abat-jour en tissu : il dirige la lumière (les globes opale diffusent partout)
+      if (/abat_jour$/.test(ud.objName || '')) o.castShadow = true;
       o.receiveShadow = ud.realtime;
       if (baked) m.shadowSide = THREE.DoubleSide;
     }
@@ -190,7 +196,7 @@ export class Apartment {
   // Sondes d'environnement : captures cubiques de la pièce déjà éclairée
   captureProbes() {
     const pmrem = new THREE.PMREMGenerator(this.renderer);
-    const glass = this.meshes.filter((o) => o.material.userData.lit === 'glass' || o.userData.realtime);
+    const glass = this.meshes.filter((o) => ['glass', 'lamp'].includes(o.material.userData.lit) || o.userData.realtime);
     glass.forEach((o) => (o.visible = false));
     const centers = {
       chambre: [4.9, 4.9], sdb: [3.55, 3.2], sas: [1.85, 5.65], cuisine: [4.3, 7.4], sejour: [4.6, 9.6],
