@@ -67,12 +67,17 @@ async function start() {
   const ch = document.getElementById('chargement');
   ch.style.opacity = 0;
   setTimeout(() => ch.remove(), 700);
-  window.__visite = { apt, nav, camera, renderer, setMode, ready: true };
+  window.__visite = {
+    apt, nav, camera, renderer, setMode, ready: true,
+    // simulation déterministe (tests automatisés, indépendante de la cadence d'affichage)
+    simulate: (seconds, step = 1 / 60) => { for (let t = 0; t < seconds; t += step) nav.update(step); },
+    paused: false,
+  };
   let last = performance.now();
   renderer.setAnimationLoop((t) => {
-    const dt = Math.min(0.1, (t - last) / 1000);
+    const dt = Math.min(0.25, (t - last) / 1000);
     last = t;
-    nav.update(dt);
+    if (!window.__visite.paused) nav.update(dt);
     composer.render();
     map.draw();
     const r = nav.currentRoom();
@@ -107,7 +112,7 @@ function setupUI() {
   const holdMap = { avant: ['fwd', 1], arriere: ['fwd', -1], gauche: ['turn', 1], droite: ['turn', -1] };
   document.querySelectorAll('#tactile [data-t]').forEach((b) => {
     const [k, v] = holdMap[b.dataset.t];
-    const on = (e) => { e.preventDefault(); nav.hold[k] = v; b.setPointerCapture?.(e.pointerId); };
+    const on = (e) => { e.preventDefault(); nav.hold[k] = v; try { b.setPointerCapture(e.pointerId); } catch (err) { /* pointeur synthétique */ } };
     const off = () => (nav.hold[k] = 0);
     b.addEventListener('pointerdown', on);
     b.addEventListener('pointerup', off);

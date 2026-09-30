@@ -1,6 +1,8 @@
 // Chargement de la maquette, éclairage précalculé par mode, sondes de pièce.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MaterialLibrary, patchShaders } from './materials.js';
 
 export const MODES = {
@@ -44,7 +46,8 @@ export class Apartment {
     this.obstacles = obstacles;
     this.lamps = lamps;
     this.lib = new MaterialLibrary(specs);
-    const gltf = await new GLTFLoader().loadAsync('models/appartement.glb', (e) => {
+    const draco = new DRACOLoader().setDecoderPath('draco/');
+    const gltf = await new GLTFLoader().setDRACOLoader(draco).loadAsync('models/appartement.glb', (e) => {
       if (e.total) onProgress?.(e.loaded / e.total);
     });
     this.root.add(gltf.scene);
@@ -61,6 +64,7 @@ export class Apartment {
       this.meshes.push(o);
     });
     this.applyMaterials();
+    this.buildMirrors();
     this.buildSky();
     this.buildCaps();
     await this.setMode('jour');
@@ -82,6 +86,30 @@ export class Apartment {
       }
       o.material = m;
       if (m.userData.lit === 'glass') o.renderOrder = 2;
+    }
+  }
+
+  // Miroir de la salle de bain : vrai reflet (rendu plan), léger voile chaud
+  buildMirrors() {
+    for (const o of [...this.meshes]) {
+      if (this.lib.specs[o.userData.matName]?.lit !== 'mirror') continue;
+      // le Reflector attend un plan orienté +Z local : on reconstruit un disque
+      o.updateWorldMatrix(true, false);
+      const g = o.geometry;
+      g.computeBoundingBox();
+      const c = g.boundingBox.getCenter(new THREE.Vector3()).applyMatrix4(o.matrixWorld);
+      const size = g.boundingBox.getSize(new THREE.Vector3());
+      const radius = Math.max(size.x, size.y, size.z) / 2;
+      const n = new THREE.Vector3().fromBufferAttribute(g.attributes.normal, 0).transformDirection(o.matrixWorld);
+      const r = new Reflector(new THREE.CircleGeometry(radius, 72), {
+        textureWidth: 1024, textureHeight: 1024, color: 0xd8d6d0, clipBias: 0.003, multisample: 4,
+      });
+      r.position.copy(c);
+      r.lookAt(c.clone().add(n));
+      r.userData = { ...o.userData, lit: 'mirror' };
+      o.parent.remove(o);
+      this.scene.add(r);
+      this.meshes = this.meshes.filter((m) => m !== o);
     }
   }
 

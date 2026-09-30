@@ -1,0 +1,127 @@
+[
+ {
+  "test": "Flèche gauche : rotation sur place vers la gauche",
+  "ok": true,
+  "detail": "Δlacet=1.00 rad, déplacement=0.000 m"
+ },
+ {
+  "test": "Flèche droite : rotation sur place vers la droite",
+  "ok": true,
+  "detail": "Δlacet=-1.00 rad"
+ },
+ {
+  "test": "Flèche haut : avance dans la direction du regard",
+  "ok": true,
+  "detail": "avancée=0.95 m"
+ },
+ {
+  "test": "Flèche bas : recule",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Collision : impossible de traverser la façade / les fenêtres",
+  "ok": true,
+  "detail": "position finale (6.44, 5.99) pièce=chambre"
+ },
+ {
+  "test": "Collision : impossible de traverser le lit",
+  "ok": true,
+  "detail": "position finale (5.33, 5.74)"
+ },
+ {
+  "test": "Passage des portes : chambre -> dégagement",
+  "ok": true,
+  "detail": "pièce=sas"
+ },
+ {
+  "test": "Glisser : regarder autour de soi",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Recentrer : regard remis à l’horizontale",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Accès direct : Séjour",
+  "ok": true,
+  "detail": "pièce=sejour"
+ },
+ {
+  "test": "Accès direct : Cuisine",
+  "ok": true,
+  "detail": "pièce=cuisine"
+ },
+ {
+  "test": "Accès direct : Salle de bain",
+  "ok": true,
+  "detail": "pièce=sdb"
+ },
+ {
+  "test": "Accès direct : Chambre",
+  "ok": true,
+  "detail": "pièce=chambre"
+ },
+ {
+  "test": "Accès direct : Dégagement",
+  "ok": true,
+  "detail": "pièce=sas"
+ },
+ {
+  "test": "Vue d’ensemble en coupe",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Mode d’éclairage : soir",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Mode d’éclairage : nuit",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Mode d’éclairage : jour",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Aucune erreur JavaScript (ordinateur)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Téléphone : boutons tactiles affichés",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Téléphone : bouton ▲ avance",
+  "ok": true,
+  "detail": "1.11 m"
+ },
+ {
+  "test": "Téléphone : bouton ↺ tourne à gauche sur place",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Téléphone : glisser au doigt pour regarder",
+  "ok": true,
+  "detail": "Δlacet=0.15"
+ },
+ {
+  "test": "Téléphone : pas de défilement horizontal",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "test": "Aucune erreur JavaScript (téléphone)",
+  "ok": true,
+  "detail": ""
+ }
+]

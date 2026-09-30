@@ -130,7 +130,7 @@ export class Navigation {
     this.dom.addEventListener('pointerdown', (e) => {
       if (this.mode !== 'visite') return;
       drag = { x: e.clientX, y: e.clientY, id: e.pointerId };
-      this.dom.setPointerCapture(e.pointerId);
+      try { this.dom.setPointerCapture(e.pointerId); } catch (err) { /* pointeur synthétique */ }
     });
     this.dom.addEventListener('pointermove', (e) => {
       if (!drag || e.pointerId !== drag.id) return;
@@ -159,7 +159,7 @@ export class Navigation {
     if (this.keys.has('ArrowRight')) turn -= 1;
     this.yaw += turn * TURN * dt;
     if (fwd) {
-      const step = Math.min(dt, 0.05) * SPEED * fwd;
+      const step = dt * SPEED * fwd;
       // sous-pas pour ne jamais traverser une cloison fine
       const n = Math.ceil(Math.abs(step) / 0.05);
       for (let i = 0; i < n; i++) {
