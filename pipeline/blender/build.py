@@ -92,6 +92,10 @@ if __name__ == '__main__':
         bpy.ops.wm.open_mainfile(filepath=BLEND)
         bake.run(sys.argv[2:] or ['jour', 'soir', 'nuit', 'nuit+plafonniers'], samples=int(os.environ.get('SPP', '128')))
         bpy.ops.wm.save_as_mainfile(filepath=os.path.join(CACHE, 'appartement_lm.blend'))
+    elif cmd == 'reencode':
+        import bake
+        bpy.ops.wm.open_mainfile(filepath=os.path.join(CACHE, 'appartement_lm.blend'))
+        bake.reencode()
     elif cmd == 'export':
         import export
         bpy.ops.wm.open_mainfile(filepath=os.path.join(CACHE, 'appartement_lm.blend'))

@@ -188,7 +188,7 @@ def denoise(lm, nrm):
     return d
 
 
-LOG_K = 256.0
+LOG_K = 1024.0
 
 
 def encode(arr, path):
@@ -198,7 +198,7 @@ def encode(arr, path):
     rgb = np.maximum(arr[..., :3], 0)
     valid = arr[..., 3] > 0.5
     lum = rgb.max(axis=-1)
-    scale = float(np.percentile(lum[valid], 99.98)) if valid.any() else 1.0
+    scale = float(np.percentile(lum[valid], 99.5)) * 1.25 if valid.any() else 1.0
     scale = max(scale, 1e-6)
     v = np.log1p(LOG_K * np.clip(rgb / scale, 0, 1)) / np.log1p(LOG_K)
     s = v * 255 + np.random.default_rng(0).uniform(-0.5, 0.5, v.shape)
@@ -253,3 +253,27 @@ def run(modes, samples=128):
     for o in bpy.data.objects:
         if o.get('bake_hide'):
             o.hide_render = False
+
+
+def reencode():
+    """Ré-encode les lightmaps à partir des données flottantes sauvegardées
+    (débruitage OIDN + encodage), sans refaire le précalcul."""
+    import glob
+    groups = atlas_objects()
+    normals = {name: bake_atlas(name, objs, 'NORMAL', 1) for name, objs in groups.items()}
+    mpath = os.path.join(OUT, 'manifest.json')
+    manifest = json.load(open(mpath))
+    for tag_, man in manifest.items():
+        for name in list(man['atlas']):
+            f = os.path.join(CACHE, f'lm_{tag_}_{name}.npy')
+            if not os.path.exists(f):
+                continue
+            lm = np.load(f).astype(np.float32)
+            if name in normals:
+                lm = denoise(lm, normals[name])
+            sc = encode(lm, os.path.join(OUT, tag_, name + '.webp'))
+            man['atlas'][name]['intensity'] = sc
+            print(f'  ré-encodage {tag_}/{name} échelle {sc:.3f}', flush=True)
+    for man in manifest.values():
+        man['log_k'] = LOG_K
+    json.dump(manifest, open(mpath, 'w'), indent=1)

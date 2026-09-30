@@ -2,7 +2,7 @@
 // et adaptation du shader three.js à l'éclairage précalculé.
 import * as THREE from 'three';
 
-const LOG_K = 256.0; // doit correspondre à pipeline/blender/bake.py
+const LOG_K = 1024.0; // doit correspondre à pipeline/blender/bake.py
 
 // ---------------------------------------------------------------------------
 // Patch global des shaders :
