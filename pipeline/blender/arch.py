@@ -104,6 +104,7 @@ def build_walls():
         return out
 
     verts, faces = [], []
+    hidden_faces = []
     vidx = {}
 
     def V(x, z, h):
@@ -116,7 +117,11 @@ def build_walls():
     def visible(mx, mz, nx, nz):
         return VISIBLE.contains(Point(mx + nx * 0.03, mz + nz * 0.03))
 
+    # les murs dépassent de 5 cm sous le sol et au-dessus du plafond :
+    # aucune fente numérique à la jonction (fuites de lumière au précalcul)
+    ext = lambda h: h
     for h0, h1, s in bands:
+        h0, h1 = ext(h0), ext(h1)
         for p in geoms(s):
             for ri, ring in enumerate(rings_of(p)):
                 ring = refine(ring)
@@ -131,9 +136,10 @@ def build_walls():
                     # normale sortante (hors du solide) dans le plan (x, z)
                     nx, nz = (dz / L, -dx / L) if area > 0 else (-dz / L, dx / L)
                     mx, mz = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
-                    if not visible(mx, mz, nx, nz):
-                        continue
                     f = [V(a[0], a[1], h0), V(b[0], b[1], h0), V(b[0], b[1], h1), V(a[0], a[1], h1)]
+                    if not visible(mx, mz, nx, nz):
+                        hidden_faces.append((f, (nx, -nz, 0.0)))
+                        continue
                     faces.append((f, (nx, -nz, 0.0)))
     # faces horizontales : dessus d'allège, sous-face de linteau
     for (lo, hi) in zip(bands[:-1], bands[1:]):
@@ -158,6 +164,16 @@ def build_walls():
         if fn.dot(Vector(n)) < 0:
             f = f[::-1]
         fl.append(f)
+    # faces jamais visibles (côté voisins) : conservées pour le précalcul
+    # uniquement, afin que les murs restent des volumes fermés
+    hl = []
+    for f, n in hidden_faces:
+        a, b, c = (Vector(verts[f[0]]), Vector(verts[f[1]]), Vector(verts[f[2]]))
+        if (b - a).cross(c - a).dot(Vector(n)) < 0:
+            f = f[::-1]
+        hl.append(f)
+    hid = mesh_obj('murs_caches', verts, hl, 'enduit')
+    tag(hid, lit='none', bake_only=True, collide=False)
     ob = mesh_obj('murs', verts, fl, 'enduit')
     bm = bmesh.new()
     bm.from_mesh(ob.data)
@@ -177,6 +193,23 @@ def build_walls():
             if not FLOOR.buffer(0.01).contains(pt) and not any(q.buffer(0.03).contains(pt) for q in OPEN_POLY.values()):
                 poly_.material_index = 1
     tag(ob, atlas='archi', room='all', collide=False, lit='lightmap')
+    # faces de façade (enduit extérieur) -> objet séparé, atlas extérieur
+    bm = bmesh.new()
+    bm.from_mesh(ob.data)
+    ext_faces = [f for f in bm.faces if f.material_index == 1]
+    bm2 = bm.copy()
+    bmesh.ops.delete(bm, geom=ext_faces, context='FACES')
+    bm.to_mesh(ob.data)
+    bm.free()
+    bmesh.ops.delete(bm2, geom=[f for f in bm2.faces if f.material_index != 1], context='FACES')
+    me2 = bpy.data.meshes.new('murs_facade')
+    bm2.to_mesh(me2)
+    bm2.free()
+    ob2 = bpy.data.objects.new('murs_facade', me2)
+    ob.users_collection[0].objects.link(ob2)
+    for m in ob.data.materials:
+        me2.materials.append(m)
+    tag(ob2, atlas='ext', room='exterieur', collide=False, lit='lightmap')
     return ob
 
 
@@ -310,9 +343,10 @@ def window(o):
         parts.append(box('appui_ext', -0.02, d + fd - 0.01, sill - 0.05, W + 0.02, T + 0.05, sill - 0.01, 'pierre_seuil', bevel=0.004))
     # dormant
     y0, y1 = d, d + fd
-    parts += [box('dormant_g', 0, y0, z0, fw, y1, head, 'menuiserie', bevel=0.004, grain='z'),
-              box('dormant_d', W - fw, y0, z0, W, y1, head, 'menuiserie', bevel=0.004, grain='z'),
-              box('dormant_h', fw, y0, head - fw, W - fw, y1, head, 'menuiserie', bevel=0.004),
+    # le dormant pénètre de 2 cm dans les tableaux (couvre les écarts de vectorisation)
+    parts += [box('dormant_g', -0.02, y0, z0, fw, y1, head + 0.02, 'menuiserie', bevel=0.004, grain='z'),
+              box('dormant_d', W - fw, y0, z0, W + 0.02, y1, head + 0.02, 'menuiserie', bevel=0.004, grain='z'),
+              box('dormant_h', fw, y0, head - fw, W - fw, y1, head + 0.02, 'menuiserie', bevel=0.004),
               box('dormant_b', fw, y0, z0, W - fw, y1, z0 + (0.03 if glazed_door else fw), 'menuiserie', bevel=0.004)]
     zt = head - transom if transom > 0 else None
     if zt:
@@ -505,9 +539,31 @@ def build_terrace():
     return objs
 
 
+def build_slabs():
+    """Dalles haute et basse + joints étanches mur/plafond et mur/sol
+    (enveloppe fermée pour le précalcul, ni exportée ni « lightmappée »)."""
+    foot = unary_union([WALLS, FLOOR] + list(OPEN_POLY.values())).buffer(0.02, join_style=2)
+    objs = []
+    top_shape = unary_union([WALLS] + list(OPEN_POLY.values())).buffer(0)
+    low_shape = unary_union([WALLS] + [OPEN_POLY[k] for k, o in OPEN.items() if o['sill'] > 0]).buffer(0)
+    for shape, z0, z1, nm in ((top_shape, H - 0.004, H + 0.05, 'joint_haut'), (low_shape, -0.05, 0.004, 'joint_bas')):
+        for i, p in enumerate(geoms(shape)):
+            ob = extrude_poly(f'{nm}_{i}', rings_of(p), z0, z1, mat='enduit', bottom=True)
+            tag(ob, lit='none', bake_only=True, collide=False)
+            objs.append(ob)
+    for p in geoms(foot):
+        ring = [list(p.exterior.coords)[:-1]]
+        for h, name in ((H + 0.04, 'dalle_haute'), (-0.04, 'dalle_basse')):
+            ob = extrude_poly(name, ring, h - 0.02 if h > 0 else h - 0.02, h, mat='enduit', bottom=True)
+            tag(ob, lit='none', bake_only=True, collide=False)
+            objs.append(ob)
+    return objs
+
+
 def build_all():
     set_collection('architecture')
     objs = [build_walls()]
+    objs += build_slabs()
     objs += build_floors_ceilings()
     objs += build_skirting()
     tiles, bath_u, bath_far = build_bath_tiles()

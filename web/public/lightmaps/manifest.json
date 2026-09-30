@@ -1,0 +1,25 @@
+{
+ "jour": {
+  "info": {
+   "mode": "jour",
+   "az": 194.24362242367644,
+   "el": 67.28261001012967,
+   "E_sky": 15.414803491837766,
+   "sun_strength": 115.61102294921875
+  },
+  "atlas": {
+   "chambre": {
+    "file": "lightmaps/jour/chambre.webp",
+    "intensity": 1.3280797794581338
+   },
+   "ext": {
+    "file": "lightmaps/jour/ext.webp",
+    "intensity": 46.24973917617836
+   },
+   "archi": {
+    "file": "lightmaps/jour/archi.webp",
+    "intensity": 46.758598122406546
+   }
+  }
+ }
+}

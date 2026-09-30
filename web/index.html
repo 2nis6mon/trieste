@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <title>Trieste — visite 3D</title>
+  <meta name="description" content="Visite libre en 3D de l'appartement de Trieste (5e étage, sur cour)." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 15 16 5l12 10v12H4z' fill='%23c0653f'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <canvas id="vue" aria-label="Vue 3D de l'appartement"></canvas>
+
+  <div id="chargement">
+    <div class="carte">
+      <h1>Trieste</h1>
+      <p>Appartement du 5<sup>e</sup> étage, sur cour</p>
+      <div class="barre"><span id="progression"></span></div>
+      <p id="etat">Chargement de la maquette…</p>
+    </div>
+  </div>
+
+  <header id="haut">
+    <div class="groupe" role="group" aria-label="Type de vue">
+      <button data-vue="visite" class="actif">Visite</button>
+      <button data-vue="coupe">Vue d'ensemble</button>
+    </div>
+    <div class="groupe" role="group" aria-label="Éclairage">
+      <button data-mode="jour" class="actif">Jour</button>
+      <button data-mode="soir">Fin de journée</button>
+      <button data-mode="nuit">Nuit</button>
+      <label id="plafonniers" hidden><input type="checkbox" /> Plafonniers</label>
+    </div>
+    <div class="groupe">
+      <button id="btn-photos">Photos de référence</button>
+      <button id="btn-aide" aria-label="Aide aux commandes">?</button>
+    </div>
+  </header>
+
+  <nav id="pieces" aria-label="Aller à une pièce"></nav>
+
+  <aside id="plan">
+    <canvas id="miniplan" aria-label="Mini-plan"></canvas>
+    <div id="piece-courante"></div>
+  </aside>
+
+  <div id="tactile" aria-label="Commandes de déplacement">
+    <button data-t="gauche" aria-label="Tourner à gauche">&#x21BA;</button>
+    <div class="col">
+      <button data-t="avant" aria-label="Avancer">&#x25B2;</button>
+      <button data-t="arriere" aria-label="Reculer">&#x25BC;</button>
+    </div>
+    <button data-t="droite" aria-label="Tourner à droite">&#x21BB;</button>
+  </div>
+  <button id="recentrer" title="Recentrer la vue">Recentrer</button>
+
+  <div id="aide" class="panneau" hidden>
+    <h2>Commandes</h2>
+    <ul>
+      <li><b>Glisser</b> (souris ou doigt) : regarder autour de soi.</li>
+      <li><b>&#x2190; / &#x2192;</b> : tourner sur place, dans le sens de la flèche.</li>
+      <li><b>&#x2191; / &#x2193;</b> : avancer / reculer.</li>
+      <li>Sur téléphone : boutons &#x21BA; &#x25B2; &#x25BC; &#x21BB; en bas de l'écran (maintenir appuyé).</li>
+      <li><b>Mini-plan</b> : touchez un point libre pour vous y rendre.</li>
+      <li><b>Vue d'ensemble</b> : murs coupés à 1,25 m ; faire pivoter en glissant, zoomer à la molette ou en pinçant.</li>
+      <li><b>Recentrer</b> : remet le regard à l'horizontale (ou recadre la vue d'ensemble).</li>
+    </ul>
+    <p class="note">Éclairage précalculé (Cycles) : soleil réel de Trieste le 21 juin, fenêtres orientées SSE sur cour.</p>
+    <button class="fermer">Fermer</button>
+  </div>
+
+  <div id="photos" class="panneau large" hidden>
+    <h2>Photos de référence</h2>
+    <p class="note">Touchez une image pour l'afficher et placer la caméra au point de vue correspondant.</p>
+    <div id="grille"></div>
+    <button class="fermer">Fermer</button>
+  </div>
+  <figure id="comparaison" hidden>
+    <img alt="" />
+    <figcaption></figcaption>
+    <button class="fermer" aria-label="Fermer la comparaison">&times;</button>
+  </figure>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

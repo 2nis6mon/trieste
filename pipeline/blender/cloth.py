@@ -25,7 +25,7 @@ def _run(ob, frames):
     sc.frame_set(1)
 
 
-def pillow(name, w, d, thick=0.03, cell=0.022, pressure=4.0, shrink=0.02, frames=24, mat=None, seed=0):
+def pillow(name, w, d, thick=0.03, cell=0.022, pressure=4.0, shrink=0.02, frames=24, mat=None, seed=0, bending=0.4):
     """Oreiller : enveloppe fermée gonflée par pression (coutures sur le pourtour).
     Repère local : x largeur, y profondeur, z épaisseur, centré à l'origine."""
     nx, ny = max(2, int(round(w / cell))), max(2, int(round(d / cell)))
@@ -62,7 +62,7 @@ def pillow(name, w, d, thick=0.03, cell=0.022, pressure=4.0, shrink=0.02, frames
     s.tension_stiffness = 12
     s.compression_stiffness = 12
     s.shear_stiffness = 6
-    s.bending_stiffness = 0.4
+    s.bending_stiffness = bending
     s.use_pressure = True
     s.uniform_pressure_force = pressure
     s.shrink_min = shrink
@@ -133,3 +133,30 @@ def grid(name, w, l, cell, mat=None, z=0.0):
         co = ob.data.vertices[lp.vertex_index].co
         uvl.data[li].uv = (co.x, co.y)
     return ob, nx, ny
+
+
+def repair(ob, cell, zmin=0.0, iters=30):
+    """Répare les sommets aberrants d'une simulation (arêtes > 2,5 x la maille,
+    sommets sous le sol) par lissage laplacien local."""
+    import numpy as np
+    me = ob.data
+    n = len(me.vertices)
+    co = np.array([v.co[:] for v in me.vertices])
+    edges = np.array([e.vertices[:] for e in me.edges])
+    nbrs = [[] for _ in range(n)]
+    for a, b in edges:
+        nbrs[a].append(b)
+        nbrs[b].append(a)
+    bad = set()
+    for _ in range(iters):
+        L = np.linalg.norm(co[edges[:, 0]] - co[edges[:, 1]], axis=1)
+        e_bad = edges[L > 2.5 * cell]
+        nb = set(e_bad.flatten().tolist()) | set(np.where(co[:, 2] < zmin)[0].tolist())
+        if not nb:
+            break
+        bad |= nb
+        for i in bad:
+            co[i] = co[nbrs[i]].mean(axis=0)
+    for i, v in enumerate(me.vertices):
+        v.co = co[i]
+    return len(bad)

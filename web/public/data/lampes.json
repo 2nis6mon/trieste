@@ -1,0 +1,53 @@
+[
+ {
+  "name": "lampe_chevet_1_lum",
+  "group": "appoint",
+  "room": "chambre",
+  "pos": [
+   4.491,
+   0.67,
+   3.507
+  ],
+  "color": [
+   1.0,
+   0.7799999713897705,
+   0.5199999809265137
+  ],
+  "power": 9.0,
+  "type": "POINT"
+ },
+ {
+  "name": "lampe_chevet_2_lum",
+  "group": "appoint",
+  "room": "chambre",
+  "pos": [
+   3.171,
+   0.67,
+   5.204
+  ],
+  "color": [
+   1.0,
+   0.7799999713897705,
+   0.5199999809265137
+  ],
+  "power": 9.0,
+  "type": "POINT"
+ },
+ {
+  "name": "plafonnier_chambre_lum",
+  "group": "plafonnier",
+  "room": "chambre",
+  "pos": [
+   5.121,
+   2.615,
+   4.87
+  ],
+  "color": [
+   1.0,
+   0.8799999952316284,
+   0.7200000286102295
+  ],
+  "power": 55.0,
+  "type": "AREA"
+ }
+]

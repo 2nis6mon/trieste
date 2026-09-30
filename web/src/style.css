@@ -1,0 +1,69 @@
+:root {
+  --fond: #f4efe7;
+  --texte: #2b2723;
+  --accent: #c0653f;
+  --verre: rgba(250, 247, 242, 0.86);
+  --bord: rgba(60, 50, 40, 0.14);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #1d1b19; font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--texte); }
+#vue { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+#vue:active { cursor: grabbing; }
+
+button { font: inherit; color: inherit; background: none; border: 0; padding: 7px 11px; border-radius: 8px; cursor: pointer; }
+button:hover { background: rgba(0, 0, 0, 0.06); }
+button.actif { background: var(--texte); color: #fff; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+#haut { position: fixed; top: max(10px, env(safe-area-inset-top)); left: 12px; right: 12px; display: flex; flex-wrap: wrap; gap: 8px; pointer-events: none; }
+.groupe { pointer-events: auto; display: flex; align-items: center; gap: 2px; background: var(--verre); backdrop-filter: blur(8px); border: 1px solid var(--bord); border-radius: 11px; padding: 3px; }
+#plafonniers { padding: 0 8px; display: flex; gap: 5px; align-items: center; cursor: pointer; }
+
+#pieces { position: fixed; left: 12px; top: 64px; display: flex; flex-direction: column; gap: 2px; background: var(--verre); backdrop-filter: blur(8px); border: 1px solid var(--bord); border-radius: 11px; padding: 3px; }
+#pieces button { text-align: left; }
+
+#plan { position: fixed; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); width: 210px; background: var(--verre); backdrop-filter: blur(8px); border: 1px solid var(--bord); border-radius: 11px; padding: 6px; }
+#miniplan { width: 100%; height: 235px; display: block; cursor: crosshair; }
+#piece-courante { text-align: center; font-weight: 600; padding-top: 2px; }
+
+#tactile { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(14px, env(safe-area-inset-bottom)); display: none; align-items: center; gap: 10px; }
+#tactile button, #recentrer { background: var(--verre); backdrop-filter: blur(8px); border: 1px solid var(--bord); width: 58px; height: 58px; border-radius: 50%; font-size: 22px; touch-action: none; user-select: none; -webkit-user-select: none; }
+#tactile .col { display: flex; flex-direction: column; gap: 8px; }
+#tactile button:active { background: var(--texte); color: #fff; }
+#recentrer { position: fixed; left: 12px; bottom: max(14px, env(safe-area-inset-bottom)); width: auto; height: auto; border-radius: 10px; font-size: 14px; padding: 9px 13px; }
+body.tactile #tactile { display: flex; }
+
+.panneau { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 40px); overflow: auto; background: var(--fond); border-radius: 14px; padding: 18px 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35); }
+.panneau.large { width: min(980px, calc(100vw - 32px)); }
+.panneau h2 { margin: 0 0 10px; font-size: 18px; }
+.panneau ul { padding-left: 18px; margin: 0 0 10px; }
+.panneau li { margin: 5px 0; }
+.note { color: #6c6258; font-size: 13px; }
+.fermer { background: var(--texte); color: #fff; margin-top: 8px; }
+#grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+#grille figure { margin: 0; cursor: pointer; }
+#grille img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 8px; display: block; }
+#grille figcaption { font-size: 12px; margin-top: 4px; }
+#comparaison { position: fixed; right: 12px; top: 64px; margin: 0; width: min(300px, 38vw); background: var(--fond); border-radius: 12px; padding: 6px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35); }
+#comparaison img { width: 100%; max-height: 55vh; object-fit: contain; border-radius: 8px; display: block; }
+#comparaison figcaption { font-size: 12px; padding: 4px 2px 0; }
+#comparaison .fermer { position: absolute; top: 10px; right: 10px; margin: 0; padding: 2px 9px; }
+
+#chargement { position: fixed; inset: 0; display: grid; place-items: center; background: #1d1b19; color: #f1ebe2; z-index: 10; transition: opacity 0.6s; }
+#chargement .carte { text-align: center; }
+#chargement h1 { font-weight: 300; letter-spacing: 0.3em; margin: 0 0 4px; }
+.barre { width: 240px; height: 4px; background: #3a3531; border-radius: 2px; margin: 14px auto; overflow: hidden; }
+.barre span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.2s; }
+
+@media (max-width: 760px) {
+  #haut { font-size: 13px; }
+  #haut button { padding: 6px 8px; }
+  #pieces { top: auto; bottom: 170px; flex-direction: row; flex-wrap: wrap; right: 12px; left: 12px; font-size: 12.5px; }
+  #plan { width: 128px; bottom: auto; top: 108px; }
+  #miniplan { height: 145px; }
+  #piece-courante { font-size: 12px; }
+  #recentrer { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 140px); }
+  #tactile button { width: 56px; height: 56px; }
+  #comparaison { top: auto; bottom: 230px; width: 44vw; }
+}
