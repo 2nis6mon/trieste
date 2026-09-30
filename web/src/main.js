@@ -7,6 +7,9 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { Apartment, MODES, ROOMS } from './scene.js';
 import { Navigation } from './navigation.js';
 import { Minimap } from './minimap.js';
+import { GTAOPass } from 'three/examples/jsm/postprocessing/GTAOPass.js';
+import { Eclairage } from './eclairage.js';
+import { Mobilier, Editeur } from './mobilier.js';
 
 const REFERENCES = [
   { f: 'rendu-chambre', t: 'Chambre — rendu d’ambiance', v: 'chambre', pos: [3.0, 6.1], look: [6.6, 4.0] },
@@ -33,10 +36,12 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPrefere
 renderer.setPixelRatio(Math.min(devicePixelRatio, touch ? 1.6 : 2));
 renderer.toneMapping = THREE.AgXToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const camera = new THREE.PerspectiveCamera(50, 1, 0.05, 900);
 const apt = new Apartment(renderer);
-let nav, map, composer, bloom, grade;
+let nav, map, composer, bloom, grade, ecl, mob, edit;
 
 function resize() {
   const w = innerWidth, h = innerHeight;
@@ -50,11 +55,29 @@ addEventListener('error', (e) => { const el = document.getElementById('etat'); i
 
 async function start() {
   const bar = document.getElementById('progression');
+  apt.onMode = (m, c) => ecl?.setMode(m, c);
   await apt.load((p) => (bar.style.width = `${Math.round(p * 100)}%`));
+  ecl = new Eclairage(apt);
+  ecl.setMode(apt.mode, apt.ceiling);
+  const [defs, defaut] = await Promise.all([
+    fetch('data/meubles.json').then((r) => r.json()),
+    fetch('data/implantation.json').then((r) => r.json()).catch(() => ({})),
+  ]);
+  mob = new Mobilier(apt, ecl, defs, defaut);
+  await apt.setMode(apt.mode, apt.ceiling); // sondes recalculées sans les meubles
   nav = new Navigation(camera, canvas, apt);
+  mob.onChange = () => nav.buildColliders();
   map = new Minimap(document.getElementById('miniplan'), apt, nav);
   composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
   composer.addPass(new RenderPass(apt.scene, camera));
+  // ombres de contact (occlusion ambiante à l'écran) ; allégé sur téléphone
+  if (!touch) {
+    const ao = new GTAOPass(apt.scene, camera, innerWidth, innerHeight);
+    ao.blendIntensity = 0.75;
+    ao.updateGtaoMaterial({ radius: 0.35, distanceExponent: 1.5, thickness: 1.0, scale: 1.0, samples: 12 });
+    ao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 12 });
+    composer.addPass(ao);
+  }
   bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.18, 0.4, 1.0);
   bloom.enabled = false;
   composer.addPass(bloom);
@@ -78,7 +101,7 @@ async function start() {
   ch.style.opacity = 0;
   setTimeout(() => ch.remove(), 700);
   window.__visite = {
-    apt, nav, camera, renderer, setMode, ready: true,
+    apt, nav, camera, renderer, setMode, ecl, mob, edit, ready: true,
     // simulation déterministe (tests automatisés, indépendante de la cadence d'affichage)
     simulate: (seconds, step = 1 / 60) => { for (let t = 0; t < seconds; t += step) nav.update(step); },
     paused: false,
@@ -92,6 +115,7 @@ async function start() {
     composer.render();
     map.draw();
     const r = nav.currentRoom();
+    ecl.updateShadows(nav.mode === 'coupe' ? null : r);
     document.getElementById('piece-courante').textContent = nav.mode === 'coupe' ? 'Vue d’ensemble' : (ROOMS[r]?.name || '');
   });
 }
@@ -110,7 +134,34 @@ function setupUI() {
   document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
   document.querySelector('#plafonniers input').addEventListener('change', (e) => setMode('nuit', e.target.checked));
   document.querySelectorAll('[data-vue]').forEach((b) => b.addEventListener('click', () => nav.setMode(b.dataset.vue)));
-  nav.onMode = (m) => document.querySelectorAll('[data-vue]').forEach((b) => b.classList.toggle('actif', b.dataset.vue === m));
+  const btnAm = document.getElementById('btn-amenager');
+  edit = new Editeur(mob, camera, canvas, nav, document.getElementById('amenager'));
+  nav.onMode = (m) => {
+    document.querySelectorAll('[data-vue]').forEach((b) => b.classList.toggle('actif', b.dataset.vue === m));
+    btnAm.hidden = m !== 'coupe';
+    ecl.setCoupe(m === 'coupe');
+    if (m !== 'coupe') { edit.setActif(false); btnAm.classList.remove('actif'); document.body.classList.remove('en-amenagement'); }
+  };
+  btnAm.addEventListener('click', () => {
+    const on = !edit.actif;
+    edit.setActif(on);
+    btnAm.classList.toggle('actif', on);
+    document.body.classList.toggle('en-amenagement', on);
+    if (on) edit.select(null);
+  });
+  const pan = document.getElementById('amenager');
+  pan.querySelectorAll('[data-rot]').forEach((b) => b.addEventListener('click', () => edit.rotate(+b.dataset.rot)));
+  pan.querySelector('.reinit').addEventListener('click', () => { mob.reset(); edit.select(edit.sel); });
+  pan.querySelector('.copier').addEventListener('click', async () => {
+    const txt = JSON.stringify(mob.state(), null, 1);
+    const out = pan.querySelector('textarea');
+    out.hidden = false;
+    out.value = txt;
+    try { await navigator.clipboard.writeText(txt); pan.querySelector('.copie').textContent = 'Copié !'; } catch (e) {
+      out.select();
+      pan.querySelector('.copie').textContent = 'Sélectionné : copiez (Ctrl+C)';
+    }
+  });
   const pieces = document.getElementById('pieces');
   for (const [id, r] of Object.entries(ROOMS)) {
     const b = document.createElement('button');

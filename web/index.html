@@ -24,6 +24,7 @@
     <div class="groupe" role="group" aria-label="Type de vue">
       <button data-vue="visite" class="actif">Visite</button>
       <button data-vue="coupe">Vue d'ensemble</button>
+      <button id="btn-amenager" hidden>Aménager</button>
     </div>
     <div class="groupe" role="group" aria-label="Éclairage">
       <button data-mode="jour" class="actif">Jour</button>
@@ -53,6 +54,23 @@
     <button data-t="droite" aria-label="Tourner à droite">&#x21BB;</button>
   </div>
   <button id="recentrer" title="Recentrer la vue">Recentrer</button>
+
+  <div id="amenager" hidden>
+    <p class="nom">Cliquez sur un meuble</p>
+    <p class="astuce">Glissez pour déplacer · Q / E pour tourner</p>
+    <div class="rang">
+      <button data-rot="15" disabled>&#x21BA; 15°</button>
+      <button data-rot="90" disabled>&#x21BA; 90°</button>
+      <button data-rot="-90" disabled>&#x21BB; 90°</button>
+      <button data-rot="-15" disabled>&#x21BB; 15°</button>
+    </div>
+    <div class="rang">
+      <button class="copier">Copier l'implantation</button>
+      <button class="reinit">Réinitialiser</button>
+    </div>
+    <p class="copie"></p>
+    <textarea hidden readonly rows="5"></textarea>
+  </div>
 
   <div id="aide" class="panneau" hidden>
     <h2>Commandes</h2>

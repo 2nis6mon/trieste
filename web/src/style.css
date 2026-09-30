@@ -67,3 +67,16 @@ body.tactile #tactile { display: flex; }
   #tactile button { width: 56px; height: 56px; }
   #comparaison { top: auto; bottom: 230px; width: 44vw; }
 }
+
+/* mode « Aménager » */
+#amenager { position: fixed; left: 12px; top: 76px; width: min(290px, calc(100vw - 24px)); background: var(--verre); backdrop-filter: blur(8px); border: 1px solid var(--bord); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+#amenager[hidden] { display: none; }
+#amenager p { margin: 0; }
+#amenager .nom { font-weight: 600; }
+#amenager .astuce, #amenager .copie { font-size: 12px; opacity: 0.75; }
+#amenager .rang { display: flex; flex-wrap: wrap; gap: 6px; }
+#amenager button { border: 1px solid var(--bord); background: var(--fond); border-radius: 8px; padding: 6px 9px; font-size: 13px; }
+#amenager button:disabled { opacity: 0.4; }
+#amenager textarea { width: 100%; font: 11px/1.3 ui-monospace, monospace; }
+canvas.amenager { cursor: grab; }
+body.en-amenagement #pieces { display: none; }

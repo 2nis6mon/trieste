@@ -2,9 +2,14 @@
 
 Visite libre, dans le navigateur (ordinateur et téléphone), de l'appartement du
 5ᵉ étage à Trieste : vraie scène 3D modélisée (murs, menuiseries, mobilier),
-matériaux physiques et **éclairage précalculé par tracé de chemins (Blender
-Cycles)**, à la manière de l'éclairage statique d'Unreal Engine. Aucun
-serveur de calcul : le site est entièrement statique.
+matériaux physiques et **éclairage mixte**, à la manière d'Unreal Engine :
+- murs, sols et plafonds : éclairage **précalculé** par tracé de chemins
+  (Blender Cycles), calculé sans les meubles déplaçables ;
+- meubles : éclairage **en temps réel** dans le navigateur (soleil calculé pour
+  Trieste avec ombres, lampes avec ombres dans la pièce où l'on se trouve,
+  lumière ambiante captée dans chaque pièce, ombres de contact).
+Les meubles peuvent donc être déplacés sans recalcul. Aucun serveur de
+calcul : le site est entièrement statique.
 
 - Modes d'éclairage : **Jour** (21 juin, 13 h 30), **Fin de journée** (21 juin,
   19 h 36), **Nuit** (lampes d'appoint, chevets et éclairages intégrés
@@ -15,6 +20,11 @@ serveur de calcul : le site est entièrement statique.
   avancer / reculer ; boutons tactiles équivalents ; collisions avec murs,
   fenêtres et meubles ; accès direct à chaque pièce ; mini-plan cliquable ;
   bouton *Recentrer* ; photos de référence superposables.
+- **Aménager** (dans la vue d'ensemble) : cliquer un meuble, le faire glisser,
+  le tourner (boutons ou touches Q / E). L'implantation est gardée dans le
+  navigateur ; *Copier l'implantation* donne un JSON à coller dans
+  `web/public/data/implantation.json` pour la rendre définitive pour tous.
+  Liste des meubles déplaçables : `web/public/data/meubles.json`.
 
 ## Arborescence
 
@@ -64,6 +74,8 @@ python pipeline/textures/gen_textures.py        # textures
 cd pipeline/blender
 python build.py scene                           # scène -> pipeline/cache/appartement.blend
 SPP=160 python build.py bake jour soir nuit nuit+plafonniers   # ~2 h sur 4 cœurs CPU
+SPP=384 python build.py bake-archi              # architecture seule, sans les meubles déplaçables
+python percer_evier.py                          # perce le plan de travail + export GLB
 python build.py export                          # -> web/public/models/appartement.glb
 python build.py preview jour chambre_lit        # rendus Cycles de contrôle
 ```

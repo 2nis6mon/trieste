@@ -260,107 +260,133 @@ def linen():
 
 
 def floral_print():
-    """Motif « ronces en fleurs » gris-vert sur blanc, interprétation de
-    NÅLBJÖRNBÄR (photo IKEA non téléchargeable depuis l'environnement)."""
+    """NÅLBJÖRNBÄR (d'après la photo produit IKEA) : semis dense de motifs
+    botaniques vert sauge aquarellés (fougères, marguerites, pompons d'ail,
+    tiges feuillues, fleurs à cinq pétales) sur toile de lin blanche."""
     N = 2048
     size = 0.50  # raccord 50 cm
-    S = 2  # suréchantillonnage
+    S = 2
     W = N * S
-    img = Image.new('RGB', (W, W), (245, 244, 239))
-    d = ImageDraw.Draw(img)
-    green = (160, 172, 158)
-    green_d = (134, 148, 134)
-    green_l = (196, 204, 192)
-    r = rng(71)
+    ppm = W / size
+    mask = Image.new('L', (W, W), 0)
+    d = ImageDraw.Draw(mask)
+    r = rng(171)
 
-    def wrap_draw(fn):
+    def wrap(fn):
         for ox in (-W, 0, W):
             for oy in (-W, 0, W):
                 fn(ox, oy)
 
-    def leaf(cx, cy, ang, L, wid, col, vein=True):
-        pts = []
-        for t in np.linspace(0, 1, 24):
-            w_ = math.sin(math.pi * t) ** 0.8 * wid * (1 + 0.08 * math.sin(t * 40))  # dentelure
-            pts.append((t * L, w_))
-        pts += [(t * L, -math.sin(math.pi * t) ** 0.8 * wid * (1 + 0.08 * math.sin(t * 40 + 1)))
-                for t in np.linspace(1, 0, 24)]
+    def poly(pts, v):
+        wrap(lambda ox, oy: d.polygon([(x + ox, y + oy) for x, y in pts], fill=v))
+
+    def line(pts, wdt, v):
+        wrap(lambda ox, oy: d.line([(x + ox, y + oy) for x, y in pts], fill=v, width=max(1, int(wdt)), joint='curve'))
+
+    def disc(cx, cy, rad, v):
+        wrap(lambda ox, oy: d.ellipse([cx - rad + ox, cy - rad + oy, cx + rad + ox, cy + rad + oy], fill=v))
+
+    def leaf_pts(cx, cy, ang, L, wid, tip=0.8):
+        pts = [(t * L, math.sin(math.pi * t) ** tip * wid) for t in np.linspace(0, 1, 18)]
+        pts += [(t * L, -math.sin(math.pi * t) ** tip * wid) for t in np.linspace(1, 0, 18)]
         ca, sa = math.cos(ang), math.sin(ang)
-        poly = [(cx + x * ca - y * sa, cy + x * sa + y * ca) for x, y in pts]
+        return [(cx + x * ca - y * sa, cy + x * sa + y * ca) for x, y in pts]
 
-        def f(ox, oy):
-            d.polygon([(x + ox, y + oy) for x, y in poly], fill=col)
-            if vein:
-                d.line([(cx + ox, cy + oy), (cx + L * ca * 0.95 + ox, cy + L * sa * 0.95 + oy)],
-                       fill=(236, 238, 232), width=max(2, int(wid * 0.08)))
-                for t in (0.3, 0.5, 0.7):
-                    bx, by = cx + L * t * ca, cy + L * t * sa
-                    for sgn in (1, -1):
-                        ex = bx + (L * 0.18) * math.cos(ang + sgn * 0.8)
-                        ey = by + (L * 0.18) * math.sin(ang + sgn * 0.8)
-                        d.line([(bx + ox, by + oy), (ex + ox, ey + oy)], fill=(236, 238, 232), width=max(1, int(wid * 0.05)))
-        wrap_draw(f)
-
-    def flower(cx, cy, rad, col):
-        def f(ox, oy):
-            for k in range(5):
-                a = k * 2 * math.pi / 5 + 0.3
-                px, py = cx + math.cos(a) * rad * 0.62, cy + math.sin(a) * rad * 0.62
-                d.ellipse([px - rad * 0.48 + ox, py - rad * 0.48 + oy, px + rad * 0.48 + ox, py + rad * 0.48 + oy],
-                          fill=(245, 244, 239), outline=col, width=max(2, int(rad * 0.1)))
-            d.ellipse([cx - rad * 0.25 + ox, cy - rad * 0.25 + oy, cx + rad * 0.25 + ox, cy + rad * 0.25 + oy], fill=col)
-        wrap_draw(f)
-
-    def berry(cx, cy, rad, col):
-        def f(ox, oy):
-            for k in range(9):
-                a = k * 2.4
-                rr = rad * 0.45 * math.sqrt(k / 9)
-                px, py = cx + math.cos(a) * rr, cy + math.sin(a) * rr
-                d.ellipse([px - rad * 0.3 + ox, py - rad * 0.3 + oy, px + rad * 0.3 + ox, py + rad * 0.3 + oy],
-                          fill=col, outline=(245, 244, 239), width=2)
-        wrap_draw(f)
-
-    ppm = W / size
-    # tiges sinueuses
-    for s in range(9):
-        x0, y0 = r.uniform(0, W), r.uniform(0, W)
-        ang = r.uniform(0, 2 * math.pi)
-        pts = []
-        x, y = x0, y0
-        for i in range(60):
-            ang += r.normal(0, 0.12)
-            x += math.cos(ang) * ppm * 0.006
-            y += math.sin(ang) * ppm * 0.006
+    def stem(cx, cy, ang, L, curv):
+        pts, a = [], ang
+        x, y = cx, cy
+        for i in range(20):
             pts.append((x, y))
-        def fstem(ox, oy, pts=pts):
-            d.line([(px + ox, py + oy) for px, py in pts], fill=green_d, width=int(ppm * 0.0014), joint='curve')
-            for i in range(3, len(pts), 5):  # épines
-                px, py = pts[i]
-                d.line([(px + ox, py + oy), (px + ox + 6, py + oy - 10)], fill=green_d, width=3)
-        wrap_draw(fstem)
-        for i in range(4, len(pts), 9):
-            px, py = pts[i]
-            a0 = math.atan2(pts[i][1] - pts[i - 1][1], pts[i][0] - pts[i - 1][0])
-            side = 1 if (i // 9) % 2 else -1
-            # feuille trifoliée
-            for k, da in enumerate((-0.6, 0.0, 0.6)):
-                L = ppm * r.uniform(0.018, 0.026) * (1.15 if k == 1 else 0.9)
-                leaf(px, py, a0 + side * 1.0 + da, L, L * 0.33, green if k != 1 else green_d)
-        for i in range(8, len(pts), 17):
-            px, py = pts[i]
-            if r.random() < 0.55:
-                flower(px + r.normal(0, 20), py + r.normal(0, 20), ppm * r.uniform(0.008, 0.011), green)
-            else:
-                berry(px + r.normal(0, 20), py + r.normal(0, 20), ppm * r.uniform(0.008, 0.011), green_d)
-    # semis de petites feuilles claires pour remplir
-    for i in range(160):
-        leaf(r.uniform(0, W), r.uniform(0, W), r.uniform(0, 6.3), ppm * 0.008, ppm * 0.0028, green_l, vein=False)
-    img = img.resize((N, N), Image.LANCZOS)
-    arr = np.asarray(img).astype(float) / 255
-    # grain du tissu (légère irrégularité d'impression)
-    n = spectral_noise(N, N, beta=1.2, seed=72)
-    arr *= (1 + n * 0.015)[..., None]
+            a += curv / 20
+            x += math.cos(a) * L / 20
+            y += math.sin(a) * L / 20
+        return pts
+
+    def fern(cx, cy, ang, L, v):
+        pts = stem(cx, cy, ang, L, r.normal(0, 0.4))
+        line(pts, ppm * 0.0012, v)
+        for i in range(2, 19, 2):
+            x, y = pts[i]
+            a0 = math.atan2(pts[i + 1][1] - y, pts[i + 1][0] - x)
+            ln = L * 0.2 * (1 - i / 21) ** 0.7
+            for sg in (1, -1):
+                poly(leaf_pts(x, y, a0 + sg * 0.95, ln, ln * 0.14), v)
+
+    def daisy(cx, cy, rad, v):
+        n = r.integers(14, 20)
+        for k in range(n):
+            a = k * 2 * math.pi / n + r.normal(0, 0.05)
+            poly(leaf_pts(cx + math.cos(a) * rad * 0.28, cy + math.sin(a) * rad * 0.28, a, rad * 0.75, rad * 0.11), v)
+        disc(cx, cy, rad * 0.26, min(255, v + 40))
+        line(stem(cx, cy, math.pi / 2 + r.normal(0, 0.3), rad * 3.2, r.normal(0, 0.5)), ppm * 0.0011, v)
+
+    def pompon(cx, cy, rad, v):
+        for k in range(46):
+            a, rr = r.uniform(0, 2 * math.pi), rad * math.sqrt(r.uniform(0, 1))
+            disc(cx + math.cos(a) * rr, cy + math.sin(a) * rr, rad * 0.13, v)
+        line(stem(cx, cy, math.pi / 2 + r.normal(0, 0.25), rad * 4.0, r.normal(0, 0.4)), ppm * 0.0011, v)
+
+    def leafy(cx, cy, ang, L, v):
+        pts = stem(cx, cy, ang, L, r.normal(0, 0.6))
+        line(pts, ppm * 0.0012, v)
+        for i in range(3, 19, 3):
+            x, y = pts[i]
+            a0 = math.atan2(pts[i + 1][1] - y, pts[i + 1][0] - x)
+            ln = L * r.uniform(0.14, 0.2)
+            sg = 1 if (i // 3) % 2 else -1
+            poly(leaf_pts(x, y, a0 + sg * 0.8, ln, ln * 0.42, tip=0.6), v)
+        x, y = pts[-1]
+        poly(leaf_pts(x, y, math.atan2(y - pts[-2][1], x - pts[-2][0]), L * 0.18, L * 0.07), v)
+
+    def blossom(cx, cy, rad, v):
+        for k in range(5):
+            a = k * 2 * math.pi / 5 + r.uniform(0, 1)
+            poly(leaf_pts(cx, cy, a, rad, rad * 0.5, tip=0.45), v)
+        disc(cx, cy, rad * 0.18, max(0, v - 60))
+        line(stem(cx, cy, math.pi / 2 + r.normal(0, 0.3), rad * 3.0, r.normal(0, 0.5)), ppm * 0.0011, v)
+        for sg in (1, -1):
+            poly(leaf_pts(cx + sg * rad * 0.2, cy + rad * 1.8, math.pi / 2 - sg * 0.9, rad * 0.9, rad * 0.35), v)
+
+    # semis : placement par rejet sur une grille périodique
+    placed = []
+    kinds = ['fern', 'daisy', 'pompon', 'leafy', 'blossom', 'leafy', 'fern']
+    tries = 0
+    while len(placed) < 95 and tries < 5000:
+        tries += 1
+        x, y = r.uniform(0, W), r.uniform(0, W)
+        ok = True
+        for (px_, py_) in placed:
+            dx = min(abs(x - px_), W - abs(x - px_))
+            dy = min(abs(y - py_), W - abs(y - py_))
+            if dx * dx + dy * dy < (ppm * 0.045) ** 2:
+                ok = False
+                break
+        if not ok:
+            continue
+        placed.append((x, y))
+        k = kinds[len(placed) % len(kinds)]
+        v = int(r.uniform(170, 245))
+        up = -math.pi / 2 + r.normal(0, 0.35)
+        if k == 'fern':
+            fern(x, y, up, ppm * r.uniform(0.07, 0.10), v)
+        elif k == 'daisy':
+            daisy(x, y, ppm * r.uniform(0.011, 0.015), v)
+        elif k == 'pompon':
+            pompon(x, y, ppm * r.uniform(0.009, 0.012), v)
+        elif k == 'leafy':
+            leafy(x, y, up, ppm * r.uniform(0.06, 0.09), v)
+        else:
+            blossom(x, y, ppm * r.uniform(0.010, 0.014), v)
+    m = np.asarray(mask.resize((N, N), Image.LANCZOS)).astype(float) / 255
+    # aquarelle : l'encre varie à l'intérieur des motifs, bords un peu fondus
+    ink = 0.72 + 0.28 * spectral_noise(N, N, beta=1.6, seed=172)
+    a = np.clip(blur_wrap(m, 0.6) * ink, 0, 1)
+    base = np.array([0.955, 0.953, 0.94])
+    sage = np.array([0.50, 0.66, 0.55])
+    arr = base[None, None] * (1 - a[..., None]) + sage[None, None] * a[..., None]
+    # toile de lin : légère irrégularité de fil (flammes) sous l'impression
+    slub = spectral_noise(N, N, beta=1.0, seed=173, aniso=(24, 1))
+    arr *= (1 + slub * 0.025)[..., None]
     save('nalbjornbar', arr, q=92)
     register('nalbjornbar', size, ['nalbjornbar'])
 

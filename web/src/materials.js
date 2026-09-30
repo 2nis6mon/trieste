@@ -36,6 +36,15 @@ export function patchShaders() {
   c = 'float lmOcclusion = 1.0;\n' + c;
   c = c.replace(/radiance \+= iblRadiance;/, 'radiance += iblRadiance * lmOcclusion;');
   THREE.ShaderChunk.lights_fragment_maps = c;
+  // Les surfaces précalculées (murs, sols, plafonds) contiennent déjà la
+  // lumière directe : les lampes temps réel n'éclairent que les meubles.
+  let b = THREE.ShaderChunk.lights_fragment_begin;
+  for (const k of ['NUM_POINT_LIGHTS', 'NUM_SPOT_LIGHTS', 'NUM_DIR_LIGHTS']) {
+    b = b.replace(`#if ( ${k} > 0 ) && defined( RE_Direct )`, `#if ( ${k} > 0 ) && defined( RE_Direct ) && !defined( USE_LIGHTMAP )`);
+  }
+  b = b.replace('#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea )',
+    '#if ( NUM_RECT_AREA_LIGHTS > 0 ) && defined( RE_Direct_RectArea ) && !defined( USE_LIGHTMAP )');
+  THREE.ShaderChunk.lights_fragment_begin = b;
 }
 
 // ---------------------------------------------------------------------------

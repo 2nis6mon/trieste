@@ -16,7 +16,8 @@
   "lampadaire": {"label": "Lampadaire", "room": "sejour", "objets": ["lampadaire_pied", "lampadaire_abat_jour"], "lumieres": ["lampadaire_lum"]},
   "olivier": {"label": "Olivier en pot", "room": "sejour", "objets": ["olivier_pot", "olivier_feuillage"]},
   "placard_sejour": {"label": "Placard PAX 350×248×60", "room": "sejour", "objets": ["pax_sejour"]},
-  "tapis_sejour": {"label": "Tapis du séjour", "room": "sejour", "objets": ["tapis_sejour"]}
+  "tapis_sejour": {"label": "Tapis du séjour", "room": "sejour", "objets": ["tapis_sejour"]},
+  "desserte": {"label": "Desserte NISSAFORS", "room": "cuisine", "objets": ["nissafors"]}
  },
  "fixes_temps_reel": ["affiche_ch_0", "affiche_ch_1", "affiche_sej_0", "affiche_sej_1", "affiche_sej_2", "plafonnier_chambre_corps", "plafonnier_repas_corps", "plafonnier_salon_corps"],
  "gardes_au_precalcul": ["lampe_chevet_1_pied", "lampe_chevet_1_dome", "lampe_chevet_2_pied", "lampe_chevet_2_dome", "lampe_tv_pied", "lampe_tv_dome", "lampadaire_pied", "lampadaire_abat_jour"]

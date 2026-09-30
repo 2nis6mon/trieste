@@ -251,6 +251,8 @@ def bake_mode(mode, groups, samples, ceiling=False, normals=None):
         np.save(os.path.join(CACHE, f'lm_{tag_}_{name}.npy'), lm.astype(np.float16))
         if normals is not None and name in normals:
             lm = denoise(lm, normals[name])
+            if os.environ.get('LISSAGE', '1') == '1':
+                lm = smooth(lm, normals[name])
         sc = encode(lm, os.path.join(OUT, tag_, name + '.webp'))
         man['atlas'][name] = {'file': f'lightmaps/{tag_}/{name}.webp', 'intensity': sc}
         print(f'  [{tag_}] {name}: {time.time() - t:.0f}s  échelle {sc:.3f}', flush=True)

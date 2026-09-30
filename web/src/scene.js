@@ -68,7 +68,7 @@ export class Apartment {
       let p = o;
       while (p && !p.userData.lit) p = p.parent;
       if (p) ud = p.userData;
-      o.userData = { ...ud, meshName: o.name };
+      o.userData = { ...ud, meshName: o.name, objName: p ? p.name : o.name };
       const mname = (o.material?.name || '').replace(/\.\d+$/, '');
       o.userData.matName = mname;
       this.meshes.push(o);
@@ -80,22 +80,32 @@ export class Apartment {
     await this.setMode('jour');
   }
 
+  // Seuls l'architecture et l'extérieur gardent l'éclairage précalculé ; les
+  // meubles sont éclairés en temps réel (soleil, lampes, sonde de la pièce).
   applyMaterials() {
     for (const o of this.meshes) {
       const ud = o.userData;
       const spec = this.lib.specs[ud.matName];
       const room = ud.room || '';
-      const atlas = spec && (spec.lit || 'lightmap') === 'lightmap' ? ud.atlas || '' : '';
-      const key = `${ud.matName}|${atlas}|${room}`;
+      const specLit = spec?.lit || 'lightmap';
+      const baked = ud.atlas === 'archi' || ud.atlas === 'ext';
+      const special = ['glass', 'mirror', 'lamp', 'none'].includes(specLit) || ['lamp', 'none', 'glass'].includes(ud.lit);
+      ud.realtime = !baked && !special;
+      const atlas = baked && specLit === 'lightmap' ? ud.atlas : '';
+      const key = `${ud.matName}|${atlas}|${room}|${ud.realtime ? 'rt' : ''}`;
       let m = this.lib.cache.get(key);
       if (!m) {
         m = this.lib.build(ud.matName);
         m.userData.atlas = atlas;
         m.userData.room = room;
+        m.userData.realtime = ud.realtime;
         this.lib.cache.set(key, m);
       }
       o.material = m;
       if (m.userData.lit === 'glass') o.renderOrder = 2;
+      o.castShadow = m.userData.lit !== 'glass' && m.userData.lit !== 'lamp';
+      o.receiveShadow = ud.realtime;
+      if (baked) m.shadowSide = THREE.DoubleSide;
     }
   }
 
@@ -165,6 +175,7 @@ export class Apartment {
     this.balance = cfg.balance;
     this.sky.material.uniforms.zenith.value.setRGB(...cfg.sky[0]).multiplyScalar(cfg.skyIntensity);
     this.sky.material.uniforms.horizon.value.setRGB(...cfg.sky[1]).multiplyScalar(cfg.skyIntensity);
+    this.onMode?.(mode, this.ceiling);
     await new Promise((r) => requestAnimationFrame(r));
     this.captureProbes();
   }
@@ -179,7 +190,7 @@ export class Apartment {
   // Sondes d'environnement : captures cubiques de la pièce déjà éclairée
   captureProbes() {
     const pmrem = new THREE.PMREMGenerator(this.renderer);
-    const glass = this.meshes.filter((o) => o.material.userData.lit === 'glass');
+    const glass = this.meshes.filter((o) => o.material.userData.lit === 'glass' || o.userData.realtime);
     glass.forEach((o) => (o.visible = false));
     const centers = {
       chambre: [4.9, 4.9], sdb: [3.55, 3.2], sas: [1.85, 5.65], cuisine: [4.3, 7.4], sejour: [4.6, 9.6],
