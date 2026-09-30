@@ -47,9 +47,19 @@ export class Apartment {
     this.lamps = lamps;
     this.lib = new MaterialLibrary(specs);
     const draco = new DRACOLoader().setDecoderPath('draco/');
-    const gltf = await new GLTFLoader().setDRACOLoader(draco).loadAsync('models/appartement.glb', (e) => {
-      if (e.total) onProgress?.(e.loaded / e.total);
-    });
+    const loader = new GLTFLoader().setDRACOLoader(draco);
+    let gltf;
+    try {
+      gltf = await loader.loadAsync('models/appartement.glb', (e) => { if (e.total) onProgress?.(e.loaded / e.total); });
+    } catch (err) {
+      // hébergement qui ne sert pas les .glb : maquette encodée en base64 dans un JSON
+      const r = await fetch('models/appartement.b64.json');
+      if (!r.ok) throw new Error('maquette introuvable (' + r.status + ')');
+      const { data } = await r.json();
+      const bin = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
+      onProgress?.(1);
+      gltf = await loader.parseAsync(bin.buffer, '');
+    }
     this.root.add(gltf.scene);
     gltf.scene.traverse((o) => {
       if (!o.isMesh) return;

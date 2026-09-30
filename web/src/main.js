@@ -46,6 +46,8 @@ function resize() {
   composer?.setSize(w, h);
 }
 
+addEventListener('error', (e) => { const el = document.getElementById('etat'); if (el) { el.textContent = 'Erreur : ' + e.message; el.style.color = '#ffb59a'; } });
+
 async function start() {
   const bar = document.getElementById('progression');
   await apt.load((p) => (bar.style.width = `${Math.round(p * 100)}%`));
@@ -153,6 +155,8 @@ function setupUI() {
 }
 
 start().catch((e) => {
-  document.getElementById('etat').textContent = 'Erreur de chargement : ' + e.message;
+  const el = document.getElementById('etat');
+  el.textContent = 'Erreur de chargement : ' + e.message;
+  el.style.color = '#ffb59a';
   console.error(e);
 });
