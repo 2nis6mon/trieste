@@ -151,7 +151,7 @@ export class Apartment {
       if (m.emissiveMap) m.emissiveIntensity = night ? 1.2 : 0.0;
     }
     const cfg = MODES[mode];
-    this.renderer.toneMappingExposure = cfg.exposure;
+    this.renderer.toneMappingExposure = cfg.exposure * (this.ceiling ? 0.5 : 1.0);
     this.balance = cfg.balance;
     this.sky.material.uniforms.zenith.value.setRGB(...cfg.sky[0]).multiplyScalar(cfg.skyIntensity);
     this.sky.material.uniforms.horizon.value.setRGB(...cfg.sky[1]).multiplyScalar(cfg.skyIntensity);

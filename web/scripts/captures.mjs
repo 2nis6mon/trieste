@@ -40,9 +40,9 @@ const VIEWS = {
   chambre_fenetres: [[4.1, 4.1], [7.0, 5.8]],
   sejour_fenetre: [[3.0, 9.6], [7.9, 9.4]],
   sejour_entree: [[6.8, 10.3], [1.0, 9.0]],
-  cuisine: [[4.1, 7.95], [4.6, 6.6]],
+  cuisine: [[2.75, 7.85], [5.4, 6.75]],
   salle_de_bain: [[2.72, 4.45], [4.4, 2.2]],
-  buanderie: [[2.2, 6.0], [1.1, 5.1]],
+  buanderie: [[2.55, 6.25], [1.05, 5.0]],
 };
 
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });

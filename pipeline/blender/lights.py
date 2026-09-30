@@ -195,7 +195,9 @@ def set_lamps(mode, ceiling=False):
         g = o.get('lamp_group')
         if g is None:
             continue
-        on = night and (g in ('appoint', 'integre') or (g == 'plafonnier' and ceiling))
+        blind = o.get('room') in ('sdb', 'sas')  # pièces aveugles : éclairées aussi le jour
+        on = (night and (g in ('appoint', 'integre') or (g == 'plafonnier' and ceiling))) or \
+             (not night and blind and g == 'plafonnier')
         if o.type == 'LIGHT':
             o.hide_render = not on
         else:
@@ -210,3 +212,36 @@ def set_lamps(mode, ceiling=False):
         if mt.get('night_emit') is not None:
             bsdf = mt.node_tree.nodes.get('Principled BSDF')
             bsdf.inputs['Emission Strength'].default_value = mt['night_emit'] if night else 0.0
+
+
+def setup_portals():
+    """Portails de lumière (Cycles) sur chaque fenêtre et porte-fenêtre : le ciel
+    est échantillonné à travers les ouvertures (bruit fortement réduit)."""
+    from mathutils import Matrix
+    for o in [o for o in bpy.data.objects if o.name.startswith('portail_')]:
+        bpy.data.objects.remove(o)
+    for op in PLAN['openings']:
+        if op['type'] not in ('window', 'door_glazed'):
+            continue
+        a1, a2, b2, b1 = [Vector((c[0], -c[1], 0)) for c in op['quad']]
+        u = (a2 - a1)
+        W = u.length
+        u.normalize()
+        mid_a = (a1 + a2) / 2
+        mid_b = (b1 + b2) / 2
+        n_in = (mid_a - mid_b).normalized()  # vers l'intérieur
+        h0, h1 = op['sill'], op['head']
+        ld = bpy.data.lights.new('portail_' + op['id'], 'AREA')
+        ld.shape = 'RECTANGLE'
+        ld.size = W
+        ld.size_y = h1 - h0
+        ld.cycles.is_portal = True
+        ob = bpy.data.objects.new('portail_' + op['id'], ld)
+        bpy.context.scene.collection.objects.link(ob)
+        # la lumière surfacique émet selon -Z local : -Z = vers l'intérieur
+        z = -n_in
+        x = u
+        y = z.cross(x)
+        M = Matrix((x, y, z)).transposed().to_4x4()
+        ob.matrix_world = Matrix.Translation(mid_b + (mid_a - mid_b) * 0.5 + Vector((0, 0, (h0 + h1) / 2))) @ M
+        ob['bake_only'] = True

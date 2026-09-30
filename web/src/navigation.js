@@ -100,7 +100,7 @@ export class Navigation {
       this.camera.fov = 45;
       this.camera.updateProjectionMatrix();
       this.orbit.target.set(4.5, 0.4, 7.0);
-      this.camera.position.set(4.5 - 2.5, 13.5, 7.0 + 9.0);
+      this.camera.position.set(4.5 - 1.5, 10.5, 7.0 + 6.5);
       this.orbit.update();
     }
     this.onMode?.(m);

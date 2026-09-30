@@ -233,6 +233,9 @@ def run(modes, samples=128):
     sc.cycles.glossy_bounces = 2
     sc.cycles.transmission_bounces = 2
     sc.cycles.use_denoising = False
+    sc.cycles.sample_clamp_indirect = 3.0
+    import lights as _l
+    _l.setup_portals()
     for o in bpy.data.objects:
         if o.get('bake_hide'):
             o.hide_render = True
