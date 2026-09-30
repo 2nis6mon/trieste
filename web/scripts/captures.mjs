@@ -22,6 +22,7 @@ async function open(page, q) {
   page.on('pageerror', (e) => logs.push('ERREUR ' + e.message));
   await page.goto(url + '?capture=1&' + q, { waitUntil: 'load' });
   await page.waitForFunction(() => window.__visite?.ready, null, { timeout: 600000 });
+  await page.addStyleTag({ content: '#haut,#pieces,#plan,#recentrer,#tactile,#aide{display:none!important}' });
   await page.waitForTimeout(1500);
   return logs;
 }
@@ -48,11 +49,13 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
 const logs = await open(page, 'piece=chambre');
 for (const mode of ['jour', 'soir', 'nuit']) {
   await page.evaluate((m) => window.__visite.setMode(m), mode);
+  await page.waitForTimeout(1500);
   for (const [name, [p, l]] of Object.entries(VIEWS)) {
     if (only && !only.includes(name)) continue;
     await shot(page, `${name}_${mode}`, `window.__visite.nav.goTo(${JSON.stringify(p)}, ${JSON.stringify(l)})`);
   }
 }
 await shot(page, 'vue_ensemble_jour', `window.__visite.setMode('jour').then(()=>window.__visite.nav.setMode('coupe'))`);
+await shot(page, 'chambre_lit_nuit_plafonniers', `window.__visite.nav.setMode('visite'); window.__visite.setMode('nuit', true).then(()=>window.__visite.nav.goTo([6.3,5.5],[3.6,4.0]))`);
 console.log('messages console :', logs.slice(0, 20));
 await browser.close();
