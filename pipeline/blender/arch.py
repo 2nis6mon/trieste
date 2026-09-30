@@ -137,7 +137,9 @@ def build_walls():
                     # test géométrique (valable pour contours extérieurs et trous)
                     nx, nz = dz / L, -dx / L
                     mx, mz = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
-                    if p.buffer(-1e-6).contains(Point(mx + nx * 0.004, mz + nz * 0.004)):
+                    ins_pos = s.contains(Point(mx + nx * 0.01, mz + nz * 0.01))
+                    ins_neg = s.contains(Point(mx - nx * 0.01, mz - nz * 0.01))
+                    if ins_pos and not ins_neg:
                         nx, nz = -nx, -nz
                     f = [V(a[0], a[1], h0), V(b[0], b[1], h0), V(b[0], b[1], h1), V(a[0], a[1], h1)]
                     if not visible(mx, mz, nx, nz):

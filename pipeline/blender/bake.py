@@ -203,7 +203,7 @@ def encode(arr, path):
     v = np.log1p(LOG_K * np.clip(rgb / scale, 0, 1)) / np.log1p(LOG_K)
     s = v * 255 + np.random.default_rng(0).uniform(-0.5, 0.5, v.shape)
     u8 = np.clip(s + 0.5, 0, 255).astype(np.uint8)[::-1]  # Blender : origine en bas
-    Image.fromarray(u8, 'RGB').save(path, 'WEBP', quality=90, method=6)
+    Image.fromarray(u8, 'RGB').save(path, 'WEBP', lossless=True, quality=100, method=6)
     return scale
 
 

@@ -193,7 +193,9 @@ export class Apartment {
     for (const m of this.lib.cache.values()) {
       const r = this.probes[m.userData.room] ? m.userData.room : alias[m.userData.room] || 'sejour';
       m.envMap = this.probes[r];
-      m.envMapIntensity = m.userData.lit === 'glass' ? 1.0 : 1.0;
+      // les menuiseries (sans lightmap) voient surtout la fenêtre voisine, plus claire que la sonde centrale
+      const joinery = ['menuiserie', 'porte_blanche', 'tablette', 'pierre_seuil', 'porte_blindee'].includes(m.name);
+      m.envMapIntensity = joinery ? 2.2 : 1.0;
       m.needsUpdate = true;
     }
   }
