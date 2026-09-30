@@ -30,7 +30,7 @@ async function open(page, q) {
 async function shot(page, name, setup) {
   if (setup) await page.evaluate(setup);
   await page.waitForTimeout(2500);
-  await page.screenshot({ path: path.join(out, name + '.jpg'), type: 'jpeg', quality: 88 });
+  await page.screenshot({ path: path.join(out, name + '.jpg'), type: 'jpeg', quality: 88, timeout: 240000 });
   console.log('capture', name);
 }
 

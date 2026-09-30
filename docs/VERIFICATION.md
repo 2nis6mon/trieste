@@ -37,6 +37,15 @@ d'affichage, très lente en rendu logiciel.
 | Pas de défilement horizontal | OK |
 | Aucune erreur JavaScript | OK |
 
+## Mode « Aménager » (`web/scripts/test_amenager.mjs`)
+
+| Vérification | Résultat |
+|---|---|
+| Clic sur un meuble dans la vue d'ensemble : sélection | OK (« Lit MANDAL 160×200 ») |
+| Glisser à la souris : déplacement | OK (0,71 m / 0,73 m) |
+| Bouton ↺ 90° : rotation | OK (π/2) |
+| Implantation mémorisée et copiable (JSON) | OK |
+
 ## Géométrie
 
 - Étanchéité des murs : lancer de rayons tous les 10 cm sur le pourtour de
@@ -49,7 +58,11 @@ d'affichage, très lente en rendu logiciel.
 - Les captures sont produites en rendu logiciel ; sur une vraie carte
   graphique le rendu est identique mais fluide.
 - Pas de test sur un iPhone réel (émulation Chromium uniquement).
-- Bruit résiduel de précalcul (marbrures légères) sur les grandes surfaces
-  blanches (façades du placard, tableaux des fenêtres), réduit par les
-  portails de lumière mais encore visible de près.
+- Meubles, murs, tableaux et niches sont éclairés en temps réel (unis, sans
+  marbrures) ; seuls sols, plafonds, faïence et extérieur gardent le
+  précalcul. Les murs perdent donc les dégradés de lumière indirecte fine.
+- Les lampes qu'on déplace gardent leur halo précalculé au sol et au plafond
+  à l'ancienne place (leur lumière directe, elle, suit la lampe).
+- En rendu logiciel (tests), les ombres des lampes de nuit ralentissent
+  fortement l'affichage ; sur une vraie carte graphique c'est fluide.
 - La salle de bain (pièce aveugle) reste assez sombre en mode jour.
