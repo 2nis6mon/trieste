@@ -1,0 +1,23 @@
+{
+ "_note": "Meubles déplaçables (éclairés en temps réel dans la visite, absents du précalcul de l'architecture). Noms d'objets Blender ; le premier objet est l'ancre (emprise au sol, pivot).",
+ "meubles": {
+  "lit": {"label": "Lit MANDAL 160×200", "room": "chambre", "objets": ["mandal", "matelas", "couette", "oreiller_0", "oreiller_1", "coussin_0", "coussin_1"]},
+  "chevet_1": {"label": "Chevet NORDKISA (lampe, eucalyptus)", "room": "chambre", "objets": ["nordkisa", "lampe_chevet_1_pied", "lampe_chevet_1_dome", "eucalyptus_vase", "eucalyptus_feuillage"], "lumieres": ["lampe_chevet_1_lum"]},
+  "chevet_2": {"label": "Chevet NORDKISA (lampe, livres)", "room": "chambre", "objets": ["nordkisa.001", "lampe_chevet_2_pied", "lampe_chevet_2_dome", "livres"], "lumieres": ["lampe_chevet_2_lum"]},
+  "placard_chambre": {"label": "Placard PAX 250×248×60", "room": "chambre", "objets": ["pax_chambre"]},
+  "tapis_chambre": {"label": "Tapis de la chambre", "room": "chambre", "objets": ["tapis_chambre"]},
+  "canape": {"label": "Canapé-lit", "room": "sejour", "objets": ["canape", "coussin_canape_0", "coussin_canape_1", "plaid"]},
+  "table": {"label": "Table ronde Ø 90", "room": "sejour", "objets": ["table_pied", "plateau", "eucalyptus_table_vase", "eucalyptus_table_feuillage"]},
+  "chaise_1": {"label": "Chaise type Cesca", "room": "sejour", "objets": ["cesca", "cesca_cannage"]},
+  "chaise_2": {"label": "Chaise type Cesca", "room": "sejour", "objets": ["cesca.001", "cesca_cannage.001"]},
+  "chaise_3": {"label": "Chaise type Cesca", "room": "sejour", "objets": ["cesca.002", "cesca_cannage.002"]},
+  "chaise_4": {"label": "Chaise type Cesca", "room": "sejour", "objets": ["cesca.003", "cesca_cannage.003"]},
+  "meuble_tv": {"label": "Meuble TV (télévision, lampe, pothos)", "room": "sejour", "objets": ["meuble_tv", "television", "ecran", "lampe_tv_pied", "lampe_tv_dome", "pot_pothos", "pothos_feuillage"], "lumieres": ["lampe_tv_lum"]},
+  "lampadaire": {"label": "Lampadaire", "room": "sejour", "objets": ["lampadaire_pied", "lampadaire_abat_jour"], "lumieres": ["lampadaire_lum"]},
+  "olivier": {"label": "Olivier en pot", "room": "sejour", "objets": ["olivier_pot", "olivier_feuillage"]},
+  "placard_sejour": {"label": "Placard PAX 350×248×60", "room": "sejour", "objets": ["pax_sejour"]},
+  "tapis_sejour": {"label": "Tapis du séjour", "room": "sejour", "objets": ["tapis_sejour"]}
+ },
+ "fixes_temps_reel": ["affiche_ch_0", "affiche_ch_1", "affiche_sej_0", "affiche_sej_1", "affiche_sej_2", "plafonnier_chambre_corps", "plafonnier_repas_corps", "plafonnier_salon_corps"],
+ "gardes_au_precalcul": ["lampe_chevet_1_pied", "lampe_chevet_1_dome", "lampe_chevet_2_pied", "lampe_chevet_2_dome", "lampe_tv_pied", "lampe_tv_dome", "lampadaire_pied", "lampadaire_abat_jour"]
+}

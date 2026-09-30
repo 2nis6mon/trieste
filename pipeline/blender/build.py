@@ -92,6 +92,10 @@ if __name__ == '__main__':
         bpy.ops.wm.open_mainfile(filepath=BLEND)
         bake.run(sys.argv[2:] or ['jour', 'soir', 'nuit', 'nuit+plafonniers'], samples=int(os.environ.get('SPP', '128')))
         bpy.ops.wm.save_as_mainfile(filepath=os.path.join(CACHE, 'appartement_lm.blend'))
+    elif cmd == 'bake-archi':
+        import bake
+        bpy.ops.wm.open_mainfile(filepath=os.path.join(CACHE, 'appartement_lm.blend'))
+        bake.run_archi(sys.argv[2:] or ['jour', 'soir', 'nuit', 'nuit+plafonniers'], samples=int(os.environ.get('SPP', '128')))
     elif cmd == 'reencode':
         import bake
         bpy.ops.wm.open_mainfile(filepath=os.path.join(CACHE, 'appartement_lm.blend'))

@@ -188,6 +188,37 @@ def denoise(lm, nrm):
     return d
 
 
+def smooth(lm, nrm, radius=24, step=4, sigma_s=10.0, sigma_r=0.2):
+    """Filtre bilatéral joint (luminance log + normales) : efface les marbrures
+    basse fréquence laissées par le débruitage sur les grandes surfaces, en
+    gardant les arêtes d'ombre franches et les limites entre surfaces."""
+    rgb = np.maximum(lm[..., :3], 0).astype(np.float32)
+    m = (lm[..., 3] > 0.5).astype(np.float32)
+    Y = rgb @ np.array([0.2126, 0.7152, 0.0722], np.float32)
+    eps = 1e-3 * max(1e-6, float(np.percentile(Y[m > 0], 99))) if m.any() else 1e-6
+    lY = np.log(Y + eps)
+    n = nrm[..., :3].astype(np.float32) * 2 - 1
+    P = radius
+    pad = lambda a: np.pad(a, [(P, P), (P, P)] + [(0, 0)] * (a.ndim - 2))
+    lYp, np_, mp, rgbp = pad(lY), pad(n), pad(m), pad(rgb)
+    H, W = Y.shape
+    acc = np.zeros_like(rgb)
+    wsum = np.zeros_like(Y)
+    for dy in range(-radius, radius + 1, step):
+        for dx in range(-radius, radius + 1, step):
+            gs = math.exp(-(dx * dx + dy * dy) / (2 * sigma_s ** 2))
+            sl = (slice(P + dy, P + dy + H), slice(P + dx, P + dx + W))
+            dl = lYp[sl] - lY
+            nd = 1.0 - (np_[sl] * n).sum(-1)
+            w = gs * mp[sl] * np.exp(-dl * dl / (2 * sigma_r ** 2)) * np.exp(-nd / 0.02)
+            acc += w[..., None] * rgbp[sl]
+            wsum += w
+    out = lm.copy()
+    ok = (wsum > 1e-6) & (m > 0)
+    out[..., :3][ok] = acc[ok] / wsum[ok][:, None]
+    return out
+
+
 LOG_K = 1024.0
 
 
@@ -274,9 +305,54 @@ def reencode():
             lm = np.load(f).astype(np.float32)
             if name in normals:
                 lm = denoise(lm, normals[name])
+                if os.environ.get('LISSAGE', '1') == '1':
+                    lm = smooth(lm, normals[name])
             sc = encode(lm, os.path.join(OUT, tag_, name + '.webp'))
             man['atlas'][name]['intensity'] = sc
             print(f'  ré-encodage {tag_}/{name} échelle {sc:.3f}', flush=True)
     for man in manifest.values():
         man['log_k'] = LOG_K
     json.dump(manifest, open(mpath, 'w'), indent=1)
+
+
+def meubles_mobiles():
+    """Objets des meubles déplaçables (web/public/data/meubles.json) : éclairés
+    en temps réel dans la visite, donc absents du précalcul de l'architecture."""
+    from lib import ROOT
+    d = json.load(open(os.path.join(ROOT, 'web', 'public', 'data', 'meubles.json')))
+    names = {n for m in d['meubles'].values() for n in m['objets']}
+    names -= set(d.get('gardes_au_precalcul', []))
+    return [o for o in bpy.data.objects if o.name in names]
+
+
+def run_archi(modes, samples=128):
+    """Précalcul de l'architecture seule (UV de lightmap existants conservés),
+    meubles déplaçables masqués : leurs ombres viennent du temps réel."""
+    sc = bpy.context.scene
+    sc.cycles.max_bounces = 8
+    sc.cycles.diffuse_bounces = 6
+    sc.cycles.glossy_bounces = 2
+    sc.cycles.transmission_bounces = 2
+    sc.cycles.use_denoising = False
+    sc.cycles.sample_clamp_indirect = 3.0
+    import lights as _l
+    _l.setup_portals()
+    hidden = [o for o in bpy.data.objects if o.get('bake_hide')] + meubles_mobiles()
+    for o in hidden:
+        o.hide_render = True
+    print('masqués :', sorted(o.name for o in hidden), flush=True)
+    groups = {k: v for k, v in atlas_objects().items() if k == 'archi'}
+    normals = {name: bake_atlas(name, objs, 'NORMAL', 1) for name, objs in groups.items()}
+    mpath = os.path.join(OUT, 'manifest.json')
+    manifest = json.load(open(mpath))
+    for m in modes:
+        ceiling = m.endswith('+plafonniers')
+        mode = m.replace('+plafonniers', '')
+        tag_, man = bake_mode(mode, groups, samples, ceiling=ceiling, normals=normals)
+        manifest.setdefault(tag_, {'atlas': {}})
+        manifest[tag_]['info'] = man['info']
+        manifest[tag_]['atlas'].update(man['atlas'])
+        with open(mpath, 'w') as f:
+            json.dump(manifest, f, indent=1)
+    for o in hidden:
+        o.hide_render = False
