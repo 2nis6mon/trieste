@@ -3,6 +3,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { Apartment, MODES, ROOMS } from './scene.js';
 import { Navigation } from './navigation.js';
 import { Minimap } from './minimap.js';
@@ -35,7 +36,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const camera = new THREE.PerspectiveCamera(50, 1, 0.05, 900);
 const apt = new Apartment(renderer);
-let nav, map, composer, bloom;
+let nav, map, composer, bloom, grade;
 
 function resize() {
   const w = innerWidth, h = innerHeight;
@@ -52,9 +53,16 @@ async function start() {
   map = new Minimap(document.getElementById('miniplan'), apt, nav);
   composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
   composer.addPass(new RenderPass(apt.scene, camera));
-  bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.35, 0.5, 0.92);
+  bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.18, 0.4, 1.0);
   bloom.enabled = false;
   composer.addPass(bloom);
+  // balance des blancs (espace linéaire, avant le mappage tonal)
+  grade = new ShaderPass({
+    uniforms: { tDiffuse: { value: null }, balance: { value: new THREE.Vector3(1, 1, 1) } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'uniform sampler2D tDiffuse; uniform vec3 balance; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); gl_FragColor = vec4(c.rgb * balance, c.a); }',
+  });
+  composer.addPass(grade);
   composer.addPass(new OutputPass());
   resize();
   addEventListener('resize', resize);
@@ -78,6 +86,7 @@ async function start() {
     const dt = Math.min(0.25, (t - last) / 1000);
     last = t;
     if (!window.__visite.paused) nav.update(dt);
+    if (apt.balance) grade.uniforms.balance.value.set(...apt.balance);
     composer.render();
     map.draw();
     const r = nav.currentRoom();

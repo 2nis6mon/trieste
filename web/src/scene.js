@@ -6,9 +6,9 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MaterialLibrary, patchShaders } from './materials.js';
 
 export const MODES = {
-  jour: { label: 'Jour', exposure: 1.0, sky: [[0.42, 0.62, 0.92], [0.86, 0.9, 0.95]], skyIntensity: 3.2 },
-  soir: { label: 'Fin de journée', exposure: 1.35, sky: [[0.36, 0.44, 0.66], [1.0, 0.72, 0.52]], skyIntensity: 1.6 },
-  nuit: { label: 'Nuit', exposure: 2.2, sky: [[0.004, 0.007, 0.016], [0.05, 0.035, 0.028]], skyIntensity: 0.25 },
+  jour: { label: 'Jour', exposure: 1.9, balance: [1.05, 1.0, 0.93], sky: [[0.42, 0.62, 0.92], [0.86, 0.9, 0.95]], skyIntensity: 3.2 },
+  soir: { label: 'Fin de journée', exposure: 2.6, balance: [1.08, 1.0, 0.9], sky: [[0.36, 0.44, 0.66], [1.0, 0.72, 0.52]], skyIntensity: 1.6 },
+  nuit: { label: 'Nuit', exposure: 1.9, balance: [1.0, 1.0, 1.0], sky: [[0.004, 0.007, 0.016], [0.05, 0.035, 0.028]], skyIntensity: 0.25 },
 };
 
 // Pièces : point de vue par défaut (plan, m) et nom affiché
@@ -146,12 +146,13 @@ export class Apartment {
       const n = m.name;
       if (m.userData.lit === 'lamp') {
         const on = night && (n !== 'plafonnier_diffuseur' || this.ceiling);
-        m.emissiveIntensity = on ? (n === 'plafonnier_diffuseur' ? 3.0 : 5.0) : 0.0;
+        m.emissiveIntensity = on ? (n === 'plafonnier_diffuseur' ? 1.6 : 2.2) : 0.0;
       }
       if (m.emissiveMap) m.emissiveIntensity = night ? 1.2 : 0.0;
     }
     const cfg = MODES[mode];
     this.renderer.toneMappingExposure = cfg.exposure;
+    this.balance = cfg.balance;
     this.sky.material.uniforms.zenith.value.setRGB(...cfg.sky[0]).multiplyScalar(cfg.skyIntensity);
     this.sky.material.uniforms.horizon.value.setRGB(...cfg.sky[1]).multiplyScalar(cfg.skyIntensity);
     await new Promise((r) => requestAnimationFrame(r));

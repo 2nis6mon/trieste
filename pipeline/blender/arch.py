@@ -397,7 +397,7 @@ def window(o):
         put(p, M)
         apply_transform(p)
     fr = join(parts, f'fenetre_{o["id"]}')
-    tag(fr, atlas='archi', room=o['room'], lit='lightmap', collide=False)
+    tag(fr, room=o['room'], lit='probe', collide=False)
     gl = join(glass, f'vitrage_{o["id"]}')
     tag(gl, room=o['room'], lit='glass', collide=False, bake_hide=True)
     return [fr, gl]
@@ -427,11 +427,11 @@ def door(o):
         put(p, M)
         apply_transform(p)
     ob = join(parts, f'porte_{o["id"]}')
-    tag(ob, atlas='archi', room=o['room'], lit='lightmap', collide=False)
+    tag(ob, room=o['room'], lit='probe', collide=False)
     out = [ob]
     if o['type'] == 'door':
         leaf = door_leaf(o, W, T, head, lin)
-        tag(leaf, atlas='archi', room=o['room'], lit='lightmap', collide=True)
+        tag(leaf, room=o['room'], lit='probe', collide=True)
         out.append(leaf)
     return out
 
@@ -507,7 +507,7 @@ def entry_door(o):
         put(p, M)
         apply_transform(p)
     ob = join(parts, 'porte_entree')
-    tag(ob, atlas='archi', room='sejour', lit='lightmap', collide=False)
+    tag(ob, room='sejour', lit='probe', collide=False)
     return [ob]
 
 
@@ -546,7 +546,7 @@ def build_slabs():
     objs = []
     top_shape = unary_union([WALLS] + list(OPEN_POLY.values())).buffer(0)
     low_shape = unary_union([WALLS] + [OPEN_POLY[k] for k, o in OPEN.items() if o['sill'] > 0]).buffer(0)
-    for shape, z0, z1, nm in ((top_shape, H - 0.004, H + 0.05, 'joint_haut'), (low_shape, -0.05, 0.004, 'joint_bas')):
+    for shape, z0, z1, nm in ():
         for i, p in enumerate(geoms(shape)):
             ob = extrude_poly(f'{nm}_{i}', rings_of(p), z0, z1, mat='enduit', bottom=True)
             tag(ob, lit='none', bake_only=True, collide=False)

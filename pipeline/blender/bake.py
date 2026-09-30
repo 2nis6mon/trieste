@@ -22,9 +22,9 @@ CACHE = os.path.join(ROOT, 'pipeline', 'cache')
 OUT = os.path.join(ROOT, 'web', 'public', 'lightmaps')
 
 # résolution des atlas (pixels) ; texel visé ~1 cm (chambre) à 5 cm (extérieur)
-ATLAS_RES = {'archi': 2048, 'chambre': 2048, 'sejour': 1536, 'cuisine': 1024, 'sdb': 1024, 'sas': 512, 'ext': 1024}
+ATLAS_RES = {'archi': 1024, 'chambre': 1024, 'sejour': 1024, 'cuisine': 1024, 'sdb': 1024, 'sas': 512, 'ext': 1024}
 # échantillons par texel (relatif au réglage global SPP)
-ATLAS_SPP = {'chambre': 1.0, 'archi': 0.6, 'sejour': 0.75, 'ext': 0.5}
+ATLAS_SPP = {'chambre': 1.0, 'archi': 0.8, 'sejour': 0.8, 'cuisine': 0.6, 'sdb': 0.5, 'sas': 0.5, 'ext': 0.3}
 
 
 def atlas_objects():

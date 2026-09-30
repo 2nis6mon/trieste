@@ -1,5 +1,22 @@
 [
  {
+  "name": "lampadaire_lum",
+  "group": "appoint",
+  "room": "sejour",
+  "pos": [
+   5.857,
+   0.0,
+   10.903
+  ],
+  "color": [
+   1.0,
+   0.7599999904632568,
+   0.5
+  ],
+  "power": 28.0,
+  "type": "POINT"
+ },
+ {
   "name": "lampe_chevet_1_lum",
   "group": "appoint",
   "room": "chambre",
@@ -34,6 +51,57 @@
   "type": "POINT"
  },
  {
+  "name": "lampe_tv_lum",
+  "group": "appoint",
+  "room": "sejour",
+  "pos": [
+   4.137,
+   0.52,
+   8.789
+  ],
+  "color": [
+   1.0,
+   0.7799999713897705,
+   0.5199999809265137
+  ],
+  "power": 9.0,
+  "type": "POINT"
+ },
+ {
+  "name": "led_cuisine",
+  "group": "integre",
+  "room": "cuisine",
+  "pos": [
+   3.077,
+   1.435,
+   6.822
+  ],
+  "color": [
+   1.0,
+   0.8199999928474426,
+   0.6000000238418579
+  ],
+  "power": 14.0,
+  "type": "AREA"
+ },
+ {
+  "name": "miroir_led.001",
+  "group": "integre",
+  "room": "sdb",
+  "pos": [
+   2.261,
+   1.62,
+   3.644
+  ],
+  "color": [
+   1.0,
+   0.8500000238418579,
+   0.6499999761581421
+  ],
+  "power": 10.0,
+  "type": "AREA"
+ },
+ {
   "name": "plafonnier_chambre_lum",
   "group": "plafonnier",
   "room": "chambre",
@@ -49,5 +117,90 @@
   ],
   "power": 55.0,
   "type": "AREA"
+ },
+ {
+  "name": "plafonnier_cuisine_lum",
+  "group": "plafonnier",
+  "room": "cuisine",
+  "pos": [
+   4.171,
+   2.615,
+   7.279
+  ],
+  "color": [
+   1.0,
+   0.8799999952316284,
+   0.7200000286102295
+  ],
+  "power": 55.0,
+  "type": "AREA"
+ },
+ {
+  "name": "plafonnier_degagement_lum",
+  "group": "plafonnier",
+  "room": "sas",
+  "pos": [
+   1.68,
+   2.615,
+   5.645
+  ],
+  "color": [
+   1.0,
+   0.8799999952316284,
+   0.7200000286102295
+  ],
+  "power": 55.0,
+  "type": "AREA"
+ },
+ {
+  "name": "plafonnier_repas_lum",
+  "group": "plafonnier",
+  "room": "sejour",
+  "pos": [
+   2.016,
+   2.615,
+   8.602
+  ],
+  "color": [
+   1.0,
+   0.8799999952316284,
+   0.7200000286102295
+  ],
+  "power": 55.0,
+  "type": "AREA"
+ },
+ {
+  "name": "plafonnier_salon_lum",
+  "group": "plafonnier",
+  "room": "sejour",
+  "pos": [
+   5.242,
+   2.615,
+   9.879
+  ],
+  "color": [
+   1.0,
+   0.8799999952316284,
+   0.7200000286102295
+  ],
+  "power": 55.0,
+  "type": "AREA"
+ },
+ {
+  "name": "spot_sdb_lum",
+  "group": "plafonnier",
+  "room": "sdb",
+  "pos": [
+   3.321,
+   2.575,
+   3.351
+  ],
+  "color": [
+   1.0,
+   0.8999999761581421,
+   0.7799999713897705
+  ],
+  "power": 30.0,
+  "type": "SPOT"
  }
 ]
