@@ -133,9 +133,12 @@ def build_walls():
                     L = math.hypot(dx, dz)
                     if L < 1e-5:
                         continue
-                    # normale sortante (hors du solide) dans le plan (x, z)
-                    nx, nz = (dz / L, -dx / L) if area > 0 else (-dz / L, dx / L)
+                    # normale sortante (hors du solide) dans le plan (x, z) :
+                    # test géométrique (valable pour contours extérieurs et trous)
+                    nx, nz = dz / L, -dx / L
                     mx, mz = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
+                    if p.buffer(-1e-6).contains(Point(mx + nx * 0.004, mz + nz * 0.004)):
+                        nx, nz = -nx, -nz
                     f = [V(a[0], a[1], h0), V(b[0], b[1], h0), V(b[0], b[1], h1), V(a[0], a[1], h1)]
                     if not visible(mx, mz, nx, nz):
                         hidden_faces.append((f, (nx, -nz, 0.0)))
