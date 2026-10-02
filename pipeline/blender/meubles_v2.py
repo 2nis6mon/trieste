@@ -71,52 +71,130 @@ def pax_tonstad(widths, D, H_tot, hinges, name):
 
 
 # ------------------------------------------------------------------ luminaires Artemide
+# Géométrie du fabricant (fichiers .3ds fournis par le propriétaire, téléchargés
+# chez Artemide ; non versionnés : pipeline/assets/artemide/, voir .gitignore).
+ART = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'artemide')
+
+
+def import_3ds(fname, parts, decimate=1.0, split=None):
+    """parts : {nom de pièce 3ds: (objet cible, matériau)} ; les pièces absentes
+    sont ignorées. split(face_centroid_mm) -> matériau permet de couper une pièce.
+    Retourne {objet cible: objet Blender} (mètres, z vertical, origine du fichier)."""
+    from lire_3ds import lire
+    import numpy as np
+    from lib import material as getmat, mesh_obj, smooth_by_angle
+    objs, _ = lire(os.path.join(ART, fname))
+    groups = {}
+    for o in objs:
+        if o['name'] not in parts:
+            continue
+        tgt, mname = parts[o['name']]
+        v = o['verts'] * 0.001
+        f = o['faces']
+        if split is not None:
+            cen = o['verts'][f].mean(1)
+            mats = [split(c) for c in cen]
+        else:
+            mats = [mname] * len(f)
+        groups.setdefault(tgt, []).append((v, f, mats))
+    out = {}
+    for tgt, lst in groups.items():
+        V, F, M, off = [], [], [], 0
+        for v, f, mats in lst:
+            V.append(v)
+            F.append(f + off)
+            M += mats
+            off += len(v)
+        V = np.concatenate(V)
+        F = np.concatenate(F)
+        ob = mesh_obj(tgt, V.tolist(), F.tolist())
+        names = sorted(set(M))
+        for n in names:
+            ob.data.materials.append(getmat(n))
+        idx = {n: i for i, n in enumerate(names)}
+        ob.data.polygons.foreach_set('material_index', [idx[m] for m in M])
+        bpy.context.view_layer.objects.active = ob
+        ob.select_set(True)
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.remove_doubles(threshold=0.00005)
+        bpy.ops.mesh.normals_make_consistent(inside=False)
+        bpy.ops.object.mode_set(mode='OBJECT')
+        if decimate < 1.0:
+            m = ob.modifiers.new('decimer', 'DECIMATE')
+            m.ratio = decimate
+            bpy.ops.object.modifier_apply(modifier=m.name)
+        smooth_by_angle(ob, 35)
+        ob.select_set(False)
+        out[tgt] = ob
+    return out
+
+
 def eclisse(name):
-    """Artemide Eclisse (Magistretti, 1967) orange : socle, sphère Ø 12 ouverte
-    vers l'avant, coque intérieure claire (diffuse la nuit). H 18 cm."""
-    R, zc = 0.06, 0.115
-    base = lathe(name + '_pied', [(0, 0), (0.06, 0), (0.06, 0.006), (0.045, 0.02), (0.012, 0.03),
-                                  (0.011, 0.058), (0.0, 0.058)], 48, 'eclisse_orange')
-    prof = [(R * math.sin(math.radians(a)), R * math.cos(math.radians(a))) for a in range(50, 181, 10)]
-    shell = lathe(name + '_coque', prof, 48, 'eclisse_orange', close=False)
-    inner = lathe(name + '_dome', [(r * 0.94, z * 0.94) for r, z in prof], 48, 'eclisse_interieur', close=False)
-    M = Matrix.Translation((0, 0, zc)) @ Matrix.Rotation(-math.pi / 2, 4, 'X')  # ouverture vers +y
-    for o in (shell, inner):
-        o.matrix_world = M
-        apply_transform(o)
-    body = join([base, shell], name + '_pied')
+    """Artemide Eclisse orange (Magistretti, 1967), géométrie Artemide.
+    Ouverture du globe orientée vers +y local (le lit)."""
+    pied, dome = name + '_pied', name + '_dome'
+    o = import_3ds('Eclisse.3ds', {
+        'Obj_000001': (pied, 'plastique_blanc'),   # douille
+        'Obj_000002': (pied, 'metal_noir'),
+        'Obj_000003': (pied, 'eclisse_orange'),    # col
+        'Obj_000004': (pied, 'caoutchouc'),        # semelle
+        'Obj_000005': (pied, 'eclisse_orange'),    # globe extérieur
+        'Obj_000006': (pied, 'eclisse_orange'),    # socle
+        'Obj_000008': (pied, 'metal_noir'),        # bague crantée
+        'Obj_000007': (dome, 'eclisse_interieur'),  # coque intérieure tournante
+        'brep_8': (dome, 'ampoule'),
+    }, decimate=0.3)
+    R = Matrix.Rotation(math.pi / 2, 4, 'Z')  # le fichier ouvre vers +x
+    for ob in o.values():
+        ob.matrix_world = R
+        apply_transform(ob)
     lo = light(name + '_lum', 9.0)
-    lo.matrix_world = Matrix.Translation((0, 0.01, zc))
-    return body, inner, lo
+    lo.matrix_world = Matrix.Translation((0, 0, 0.115))
+    return o[pied], o[dome], lo
 
 
 def nessino(name):
-    """Artemide Nessino blanche (Mattioli, 1967) : pied évasé, dôme Ø 32, H 22 cm."""
-    base = lathe(name + '_pied', [(0, 0), (0.075, 0), (0.075, 0.006), (0.032, 0.02), (0.019, 0.125), (0.0, 0.125)],
-                 48, 'nessino_pied')
-    dome = lathe(name + '_dome', [(0.004, 0.122), (0.152, 0.122), (0.16, 0.128), (0.156, 0.155), (0.135, 0.185),
-                                  (0.09, 0.208), (0.0, 0.22)], 64, 'nessino')
+    """Artemide Nessino blanche (Mattioli, 1967), géométrie Artemide (Ø 32, H 22)."""
+    pied, dome = name + '_pied', name + '_dome'
+    o = import_3ds('Nessino.3ds', {'Obj_000001': (dome, None)}, decimate=0.5,
+                   split=lambda c: 'nessino_pied' if c[2] < 118 else 'nessino')
+    ob = o[dome]
+    # pied et dôme dans deux objets (le dôme est diffusant la nuit)
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.view_layer.objects.active = ob
+    ob.select_set(True)
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='DESELECT')
+    ob.active_material_index = [m.name for m in ob.data.materials].index('nessino_pied')
+    bpy.ops.object.material_slot_select()
+    bpy.ops.mesh.separate(type='SELECTED')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    base = [x for x in bpy.data.objects if x.name.startswith(dome + '.')][0]
+    base.name = pied
+    for x in (ob, base):
+        x.select_set(False)
     lo = light(name + '_lum', 9.0)
-    lo.matrix_world = Matrix.Translation((0, 0, 0.15))
-    return base, dome, lo
+    lo.matrix_world = Matrix.Translation((0, 0, 0.155))
+    return base, ob, lo
 
 
 def tolomeo_mega_wall(name):
-    """Artemide Tolomeo Mega, version murale : platine, bras articulé aluminium
-    (finition inox), diffuseur tronconique Ø 36 beige. Local : y sort du mur."""
-    plate = box(name + '_platine', -0.04, 0.0, 1.66, 0.04, 0.025, 1.90, 'inox', bevel=0.004)
-    knuckle = cylinder('articulation', 0.016, 1.76, 1.82, 20, 'inox', cy=0.04)
-    arm1 = tube('bras', [(0, 0.04, 1.79), (0, 0.42, 2.06)], 0.009, 12, 'inox')
-    joint = cylinder('rotule', 0.014, 2.04, 2.08, 16, 'inox', cy=0.42)
-    arm2 = tube('avant_bras', [(0, 0.42, 2.06), (0, 0.80, 1.86)], 0.008, 12, 'inox')
-    hub = cylinder('moyeu', 0.022, 1.80, 1.86, 20, 'inox', cy=0.80)
-    pied = join([plate, knuckle, arm1, joint, arm2, hub], name + '_pied')
-    shade = lathe(name + '_abat_jour', [(0.15, 1.80), (0.165, 1.66), (0.18, 1.50)], 64, 'tolomeo_diffuseur', close=False)
-    shade.matrix_world = Matrix.Translation((0, 0.80, 0))
-    apply_transform(shade)
+    """Artemide Tolomeo Mega Parete (aluminium, diffuseur parchemin Ø 32),
+    géométrie Artemide. Local : platine au mur en y = 0, bras vers +y, z vers le haut ;
+    origine = centre de la platine (à fixer à la hauteur voulue)."""
+    pied, shade = name + '_pied', name + '_abat_jour'
+    o = import_3ds('Tolomeo_Mega_Parete.3ds', {
+        'brep_3': (pied, 'inox'), 'shell_1': (pied, 'inox'), 'shell_2': (pied, 'inox'),
+        'shell_3': (pied, 'inox'), 'brep_1': (pied, 'inox'), 'brep_2': (shade, 'tolomeo_diffuseur'),
+    }, decimate=0.6)
+    R = Matrix.Rotation(math.pi / 2, 4, 'Z')  # le fichier sort du mur vers +x
+    for ob in o.values():
+        ob.matrix_world = R
+        apply_transform(ob)
     lo = light(name + '_lum', 20.0, size=0.06)
-    lo.matrix_world = Matrix.Translation((0, 0.80, 1.66))
-    return pied, shade, lo
+    lo.matrix_world = Matrix.Translation((0, 0.622, 0.69))
+    return o[pied], o[shade], lo
 
 
 # ------------------------------------------------------------------ séjour : enfilade + TV
@@ -173,9 +251,8 @@ def nespresso_inissia(name):
 
 # ------------------------------------------------------------------ application
 def remove(*names):
-    for n in names:
-        o = bpy.data.objects.get(n)
-        if o:
+    for o in list(bpy.data.objects):
+        if any(o.name == n or o.name.startswith(n + '.') for n in names):
             bpy.data.objects.remove(o)
 
 
@@ -196,9 +273,9 @@ def main():
     out.append(px_)
     # --- chevets : Eclisse orange (ouverture vers le lit)
     C = L.CHAMBRE
-    for key, dx in (('chevet_1', 0.13), ('chevet_2', 0.2)):
+    for key, (dx, dy) in (('chevet_1', (0.13, 0.2)), ('chevet_2', (0.2, 0.335))):
         c = C[key]
-        M = frame_matrix(c['frame'], c['s0'], c['t0']) @ Matrix.Translation((dx, 0.2, 0.67))
+        M = frame_matrix(c['frame'], c['s0'], c['t0']) @ Matrix.Translation((dx, dy, 0.67))
         body, inner, lo = eclisse('lampe_' + key)
         rot = Matrix.Rotation(math.radians(-35 if key == 'chevet_1' else 35), 4, 'Z')
         place([body, inner, lo], M @ rot)
@@ -218,15 +295,15 @@ def main():
     place(parts, frame_matrix(fr, s0, 0.01))
     tvu = join(parts, 'meuble_tv')
     tag(tvu, room='sejour', collide=True, lit='probe', label='Enfilade vintage 164x46x56')
-    sofa_cx = RS.MUR_CANAPE.pt((RS.MUR_CANAPE.length - 2.0) / 2 + 1.0)[0]
-    s_tv = min(max(fr.o[0] - sofa_cx, s0 + 0.55), s0 + Wf - 0.52)
+        # TV côté fenêtre / terrasse, lampe Nessino côté cuisine
+    s_tv = s0 + 0.10 + 0.50
     tvp, screen = television(45)
     place(tvp + [screen], frame_matrix(fr, s_tv, 0.21, 0.56))
     tvj = join(tvp, 'television')
     tag(tvj, room='sejour', collide=False, lit='probe')
     tag(screen, room='sejour', lit='probe', collide=False)
     base, dome, lo = nessino('lampe_tv')
-    place([base, dome, lo], frame_matrix(fr, s0 + 0.22, 0.23, 0.56))
+    place([base, dome, lo], frame_matrix(fr, s0 + Wf - 0.22, 0.23, 0.56))
     tag(base, room='sejour', lit='probe', collide=False)
     tag(dome, room='sejour', lit='lamp', lamp_group='appoint', collide=False)
     tag(lo, room='sejour', lamp_group='appoint')
@@ -239,7 +316,14 @@ def main():
     fr = RS.MUR_CANAPE
     s_sofa = (fr.length - 2.0) / 2
     pied, shade, lo = tolomeo_mega_wall('lampadaire')
-    place([pied, shade, lo], frame_matrix(fr, s_sofa + 2.0 + 0.05, 0.0))
+    place([pied, shade, lo], frame_matrix(fr, s_sofa + 2.0 + 0.05, 0.0, 0.95))
+    # tableaux au-dessus du canapé : 1 m vers la fenêtre (demande du propriétaire)
+    remove('affiche_sej_0', 'affiche_sej_1')
+    for i, (ds, art) in enumerate(((-0.28, 'affiche_cercles'), (0.28, 'affiche_formes'))):
+        pf = poster_frame(f'affiche_sej_{i}', 0.40, 0.50, art)
+        pf.matrix_world = frame_matrix(fr, s_sofa + 1.0 + ds + 1.0, 0.0, 1.45)
+        apply_transform(pf)
+        tag(pf, room='sejour', collide=False, lit='probe')
     tag(pied, room='sejour', lit='probe', collide=False)
     tag(shade, room='sejour', lit='lamp', lamp_group='appoint', collide=False)
     tag(lo, room='sejour', lamp_group='appoint')

@@ -98,5 +98,6 @@
   "tolomeo_diffuseur": {"color": "#e3d6bd", "roughness": 0.85, "emissive": "#ffc98e", "side": "double", "lit": "lamp", "sheen": 0.3, "sheenColor": "#ffffff"},
   "simeas":         {"color": "#ffffff", "map": "simeas", "normalMap": "simeas_n", "normalScale": 1.2, "roughness": 0.97, "size": 0.5, "sheen": 0.4, "sheenColor": "#ffffff", "sheenRoughness": 0.8, "lit": "lightmap"},
   "nespresso_noir": {"color": "#121213", "roughness": 0.25, "clearcoat": 0.7, "clearcoatRoughness": 0.1, "lit": "lightmap"},
-  "nespresso_grille": {"color": "#3a3a3c", "metalness": 0.6, "roughness": 0.4, "lit": "lightmap"}
+  "nespresso_grille": {"color": "#3a3a3c", "metalness": 0.6, "roughness": 0.4, "lit": "lightmap"},
+  "ampoule":        {"color": "#fff8ec", "roughness": 0.1, "emissive": "#ffffff", "lit": "lamp"}
 }

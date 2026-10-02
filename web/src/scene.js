@@ -110,7 +110,7 @@ export class Apartment {
       o.castShadow = m.userData.lit !== 'glass' && m.userData.lit !== 'lamp' && ud.atlas !== 'archi' && !/^(tableau|niche)_/.test(ud.objName || '');
       // abat-jour en tissu : il dirige la lumière (les globes opale diffusent partout)
       if (/abat_jour$/.test(ud.objName || '')) o.castShadow = true;
-      o.receiveShadow = ud.realtime;
+      o.receiveShadow = !baked; // lampes et verres aussi : sinon le soleil les traverse
       if (baked) m.shadowSide = THREE.DoubleSide;
     }
   }

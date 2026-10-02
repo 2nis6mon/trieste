@@ -3,3 +3,4 @@ dist/
 pipeline/cache/
 __pycache__/
 *.blend1
+pipeline/assets/
