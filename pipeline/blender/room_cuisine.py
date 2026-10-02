@@ -118,8 +118,7 @@ def upper(w, name, glazed=False, z0=1.45, z1=2.25, depth=0.37):
             a, b = k * w / n, (k + 1) * w / n
             fr = front(a, b, z0, z1, f'{name}_porte{k}', 'bottom')
             for o in fr:   # front() est construit à y = D : on le ramène à la profondeur murale
-                o.location.y += depth - D
-                apply_transform(o)
+                o.data.transform(Matrix.Translation((0.0, depth - D, 0.0)))
             p += fr
     else:
         # deux portes HEJSTA superposées : cadre aluminium laqué blanc fin, verre clair,
