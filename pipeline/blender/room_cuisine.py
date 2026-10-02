@@ -4,7 +4,7 @@ angle de ~8° : deux travées alignées sur chaque pan de mur, plan de travail
 d'un seul tenant (coupe d'onglet au droit de l'angle).
 Ouest -> est : réfrigérateur sous plan, bloc tiroirs, four + plaque, colonne
 étroite 20 cm, évier rond (au droit des arrivées d'eau vues sur la vidéo).
-Façades blanches type ASPUDDEN, poignées type BILLSBRO, plan EKBACKEN
+Façades IKEA VOXTORP blanc mat sans poignée (prise intégrée), portes vitrées HEJSTA, plan EKBACKEN
 terracotta à chant clair, 2 meubles hauts (fermé + vitré), desserte
 NISSAFORS verte devant la fenêtre.
 """
@@ -36,31 +36,29 @@ WZ = 0.038      # épaisseur du plan
 
 def plinth_and_carcass(w, name):
     p = [box(name + '_caisson', 0.0, 0.0, 0.08, w, D - 0.002, TOP, 'caisson_cuisine'),
-         box(name + '_socle', 0.0, 0.0, 0.0, w, D - 0.05, 0.08, 'aspudden')]
+         box(name + '_socle', 0.0, 0.0, 0.0, w, D - 0.05, 0.08, 'voxtorp')]
     return p
 
 
 def front(x0, x1, z0, z1, name, handle='top', glass=False):
-    """Façade avec léger cadre (profil fin) + poignée barre BILLSBRO."""
+    """Façade VOXTORP blanc mat, sans poignée : prise de main intégrée = creux
+    fraisé dans le chant (en haut pour les éléments bas, en bas pour les hauts)."""
     y0, y1 = D, D + 0.019
-    parts = [box(name, x0 + 0.0015, y0, z0 + 0.0015, x1 - 0.0015, y1, z1 - 0.0015, 'aspudden', bevel=0.0015, grain='z')]
-    # cadre fin en relief (4 lisières)
-    b, e = 0.045, 0.003
-    parts += [box(name + '_l', x0 + 0.0015, y1, z0 + 0.0015, x0 + b, y1 + e, z1 - 0.0015, 'aspudden', bevel=0.001, grain='z'),
-              box(name + '_r', x1 - b, y1, z0 + 0.0015, x1 - 0.0015, y1 + e, z1 - 0.0015, 'aspudden', bevel=0.001, grain='z'),
-              box(name + '_t', x0 + b, y1, z1 - b, x1 - b, y1 + e, z1 - 0.0015, 'aspudden', bevel=0.001),
-              box(name + '_b', x0 + b, y1, z0 + 0.0015, x1 - b, y1 + e, z0 + b, 'aspudden', bevel=0.001)]
-    if handle == 'top':
-        hw = min(0.32, (x1 - x0) * 0.6)
-        cx = (x0 + x1) / 2
-        parts.append(box(name + '_poignee', cx - hw / 2, y1 + e, z1 - 0.05, cx + hw / 2, y1 + e + 0.022, z1 - 0.038, 'plastique_blanc', bevel=0.003))
-    elif handle in ('left', 'right'):
-        hx = x0 + 0.05 if handle == 'left' else x1 - 0.05
-        parts.append(box(name + '_poignee', hx - 0.006, y1 + e, z0 + 0.08, hx + 0.006, y1 + e + 0.022, z0 + 0.32, 'plastique_blanc', bevel=0.003, grain='z'))
-    elif handle == 'bottom':
-        hw = min(0.32, (x1 - x0) * 0.6)
-        cx = (x0 + x1) / 2
-        parts.append(box(name + '_poignee', cx - hw / 2, y1 + e, z0 + 0.04, cx + hw / 2, y1 + e + 0.022, z0 + 0.052, 'plastique_blanc', bevel=0.003))
+    g = 0.0015
+    hw = min(0.36, (x1 - x0) * 0.62)          # largeur de la prise
+    cx = (x0 + x1) / 2
+    gh, gd = 0.032, 0.013                      # hauteur et profondeur du creux
+    if handle in ('top', 'left', 'right'):
+        zs0, zs1 = z1 - g - gh, z1 - g        # bande de prise en haut
+        body = (z0 + g, zs0)
+    else:
+        zs0, zs1 = z0 + g, z0 + g + gh
+        body = (zs1, z1 - g)
+    parts = [box(name, x0 + g, y0, body[0], x1 - g, y1, body[1], 'voxtorp', bevel=0.0015, grain='z'),
+             box(name + '_pg', x0 + g, y0, zs0, cx - hw / 2, y1, zs1, 'voxtorp', bevel=0.0015),
+             box(name + '_pd', cx + hw / 2, y0, zs0, x1 - g, y1, zs1, 'voxtorp', bevel=0.0015),
+             # fond du creux (en retrait), légèrement plus sombre (ombre portée de la prise)
+             box(name + '_prise', cx - hw / 2, y0, zs0, cx + hw / 2, y1 - gd, zs1, 'voxtorp_prise', bevel=0.004)]
     return parts
 
 
@@ -121,24 +119,25 @@ def upper(w, name, glazed=False, z0=1.45, z1=2.25, depth=0.37):
     p = [box(name + '_caisson', 0, 0, z0, w, depth - 0.002, z1, 'caisson_cuisine')]
     y0, y1 = depth, depth + 0.019
     if not glazed:
+        # portes VOXTORP, prise intégrée en bas (élément mural)
         n = 2 if w > 0.6 else 1
         for k in range(n):
             a, b = k * w / n, (k + 1) * w / n
-            p += [box(f'{name}_porte{k}', a + 0.0015, y0, z0 + 0.0015, b - 0.0015, y1, z1 - 0.0015, 'aspudden', bevel=0.0015, grain='z')]
-            hx = b - 0.04 if k == 0 and n == 2 else a + 0.04
-            p.append(box(f'{name}_poignee{k}', hx - 0.006, y1, z0 + 0.04, hx + 0.006, y1 + 0.022, z0 + 0.26, 'plastique_blanc', bevel=0.003, grain='z'))
-        # intérieur non visible
+            fr = front(a, b, z0, z1, f'{name}_porte{k}', 'bottom')
+            for o in fr:   # front() est construit à y = D : on le ramène à la profondeur murale
+                o.location.y += depth - D
+                apply_transform(o)
+            p += fr
     else:
-        # deux portes vitrées superposées (cadre blanc + verre) et étagères avec vaisselle
+        # deux portes HEJSTA superposées : cadre aluminium laqué blanc fin, verre clair,
+        # poignée intégrée verticale (profil plus épais côté ouverture) ; étagère + vaisselle
         zm = (z0 + z1) / 2
+        e = 0.02
         for k, (a, b) in enumerate(((z0, zm), (zm, z1))):
-            e = 0.05
-            p += [box(f'{name}_c{k}g', 0.0015, y0, a + 0.0015, e, y1, b - 0.0015, 'aspudden', bevel=0.0015, grain='z'),
-                  box(f'{name}_c{k}d', w - e, y0, a + 0.0015, w - 0.0015, y1, b - 0.0015, 'aspudden', bevel=0.0015, grain='z'),
-                  box(f'{name}_c{k}h', e, y0, b - e, w - e, y1, b - 0.0015, 'aspudden', bevel=0.0015),
-                  box(f'{name}_c{k}b', e, y0, a + 0.0015, w - e, y1, a + e, 'aspudden', bevel=0.0015)]
-            p.append(box(f'{name}_poignee{k}', w / 2 - 0.12, y1, a + 0.012, w / 2 + 0.12, y1 + 0.022, a + 0.024, 'plastique_blanc', bevel=0.003))
-        # l'intérieur du caisson vitré se voit : parois blanches + étagère
+            p += [box(f'{name}_c{k}g', 0.0015, y0, a + 0.0015, e, y1, b - 0.0015, 'hejsta_cadre', bevel=0.002, grain='z'),
+                  box(f'{name}_c{k}d', w - e - 0.008, y0, a + 0.0015, w - 0.0015, y1 + 0.008, b - 0.0015, 'hejsta_cadre', bevel=0.003, grain='z'),
+                  box(f'{name}_c{k}h', e, y0, b - e, w - e - 0.008, y1, b - 0.0015, 'hejsta_cadre', bevel=0.002),
+                  box(f'{name}_c{k}b', e, y0, a + 0.0015, w - e - 0.008, y1, a + e, 'hejsta_cadre', bevel=0.002)]
         p.append(box(name + '_etagere', 0.018, 0.0, zm - 0.009, w - 0.018, depth - 0.02, zm + 0.009, 'caisson_cuisine'))
     return p
 
@@ -147,7 +146,7 @@ def glazing(w, name, z0=1.45, z1=2.25, depth=0.37):
     zm = (z0 + z1) / 2
     g = []
     for k, (a, b) in enumerate(((z0, zm), (zm, z1))):
-        g.append(box(f'{name}_verre{k}', 0.045, depth + 0.008, a + 0.045, w - 0.045, depth + 0.012, b - 0.045, 'verre_extra'))
+        g.append(box(f'{name}_verre{k}', 0.018, depth + 0.008, a + 0.018, w - 0.026, depth + 0.012, b - 0.018, 'verre'))
     return join(g, name + '_vitrage')
 
 
@@ -337,7 +336,7 @@ def build():
         tag(ob, atlas='cuisine', room='cuisine', collide=True, lit='lightmap', label='Cuisine')
         out.append(ob)
     # fileur au coude
-    fil = box('fileur', 0.0, 0.0, 0.08, sw - 1.20, D + 0.019, TOP, 'aspudden')
+    fil = box('fileur', 0.0, 0.0, 0.08, sw - 1.20, D + 0.019, TOP, 'voxtorp')
     place_all([fil], frame_matrix(fA, 0.0, 0.0))
     tag(fil, atlas='cuisine', room='cuisine', collide=True, lit='lightmap')
     out.append(fil)
@@ -351,7 +350,7 @@ def build():
         tag(ob, atlas='cuisine', room='cuisine', collide=True, lit='lightmap', label='Cuisine')
         out.append(ob)
     # joue de finition côté est
-    joue = box('joue', 0.0, 0.0, 0.0, 0.019, D + 0.019, TOP, 'aspudden')
+    joue = box('joue', 0.0, 0.0, 0.0, 0.019, D + 0.019, TOP, 'voxtorp')
     place_all([joue], frame_matrix(fB, sk - 1.40 - 0.019, 0.0))
     tag(joue, atlas='cuisine', room='cuisine', collide=True, lit='lightmap')
     out.append(joue)

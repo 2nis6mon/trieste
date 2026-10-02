@@ -123,5 +123,8 @@ standard italien 2,10 m (non mesurée).
 | Desserte | Nespresso Inissia noire, 12 × 23 × 32 cm, posée en long sur le plateau haut | Propriétaire |
 | Éclairage | Toutes les sources à 2700 K (balance des blancs d'intérieur 4000 K) | Propriétaire |
 | Pothos du meuble TV | Retiré (place prise par la TV et la Nessino) | Choix d'implantation |
+| Façades cuisine | IKEA VOXTORP blanc mat sans poignée : prise de main creusée dans le chant (en haut des éléments bas, en bas des éléments muraux) | Propriétaire ; fiche IKEA via résultats de recherche |
+| Portes vitrées (meuble haut droit) | IKEA HEJSTA : cadre aluminium laqué blanc fin, verre trempé clair, poignée verticale intégrée ; 2 portes superposées 60 × 40 conservées (le lien indique 40 × 60) | Propriétaire ; à confirmer |
+| Olivier du séjour | Retiré | Propriétaire |
 
 Les fichiers .3ds Artemide (téléchargements fabricant fournis par le propriétaire) ne sont pas versionnés : `pipeline/assets/artemide/` (voir `.gitignore`). Le lecteur `pipeline/blender/lire_3ds.py` les importe.

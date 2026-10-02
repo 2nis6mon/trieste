@@ -133,14 +133,6 @@
     "lampadaire_lum"
    ]
   },
-  "olivier": {
-   "label": "Olivier en pot",
-   "room": "sejour",
-   "objets": [
-    "olivier_pot",
-    "olivier_feuillage"
-   ]
-  },
   "placard_sejour": {
    "label": "Placard PAX 300×248×60, portes TONSTAD",
    "room": "sejour",

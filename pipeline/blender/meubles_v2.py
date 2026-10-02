@@ -249,6 +249,39 @@ def nespresso_inissia(name):
     return join(p, name)
 
 
+# ------------------------------------------------------------------ cuisine
+def cuisine_v2():
+    """Reconstruit les caissons et façades (mêmes emplacements que room_cuisine.build)."""
+    import room_cuisine as RC
+    from room_chambre import place_all
+    remove('tiroirs_a', 'fileur', 'four', 'etroit', 'evier_meuble', 'joue', 'haut_ferme', 'haut_vitre',
+           'haut_vitre_vitrage')
+    fA, fB = RC.RUN_A, RC.RUN_B
+    sw, sk = fA.length - 0.005, fB.length
+    items = [(fA, 'tiroirs_a', RC.drawers_unit(0.60, 'tiroirs_a', 3), sw - 1.20),
+             (fB, 'four', RC.oven_unit(), sk - 0.60), (fB, 'etroit', RC.narrow_unit(), sk - 0.80),
+             (fB, 'evier_meuble', RC.drawers_unit(0.60, 'evier_meuble', 2), sk - 1.40)]
+    for fr, name, parts, s0 in items:
+        place_all(parts, frame_matrix(fr, s0, 0.0))
+        tag(join(parts, name), room='cuisine', collide=True, lit='probe', label='Cuisine (VOXTORP)')
+    fil = box('fileur', 0.0, 0.0, 0.08, sw - 1.20, RC.D + 0.019, RC.TOP, 'voxtorp')
+    place_all([fil], frame_matrix(fA, 0.0, 0.0))
+    tag(fil, room='cuisine', collide=True, lit='probe')
+    joue = box('joue', 0.0, 0.0, 0.0, 0.019, RC.D + 0.019, RC.TOP, 'voxtorp')
+    place_all([joue], frame_matrix(fB, sk - 1.40 - 0.019, 0.0))
+    tag(joue, room='cuisine', collide=True, lit='probe')
+    closed = RC.upper(0.80, 'haut_ferme')
+    place_all(closed, frame_matrix(fA, sw - 0.80, 0.0))
+    tag(join(closed, 'haut_ferme'), room='cuisine', collide=False, lit='probe')
+    Mg = frame_matrix(fA, sw - 1.40, 0.0)
+    glz = RC.upper(0.60, 'haut_vitre', glazed=True)
+    place_all(glz, Mg)
+    tag(join(glz, 'haut_vitre'), room='cuisine', collide=False, lit='probe')
+    gv = RC.glazing(0.60, 'haut_vitre')
+    place_all([gv], Mg)
+    tag(gv, room='cuisine', lit='glass', collide=False, bake_hide=True)
+
+
 # ------------------------------------------------------------------ application
 def remove(*names):
     for o in list(bpy.data.objects):
@@ -337,6 +370,10 @@ def main():
     place([ns], frame_matrix(niche, 0.09, 0.03) @ Matrix.Translation((0.2525, 0.15, 0.752))
           @ Matrix.Rotation(math.pi / 2, 4, 'Z'))
     tag(ns, room='cuisine', lit='probe', collide=False)
+    # --- séjour : olivier retiré (demande du propriétaire)
+    remove('olivier_pot', 'olivier_feuillage', 'terreau_olivier', 'pot_olivier')
+    # --- cuisine : façades VOXTORP sans poignée, portes vitrées HEJSTA
+    cuisine_v2()
     # --- toutes les lampes à 2700 K
     for o in bpy.data.objects:
         if o.type == 'LIGHT' and o.get('lamp_group'):

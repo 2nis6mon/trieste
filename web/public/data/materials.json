@@ -99,5 +99,8 @@
   "simeas":         {"color": "#ffffff", "map": "simeas", "normalMap": "simeas_n", "normalScale": 1.2, "roughness": 0.97, "size": 0.5, "sheen": 0.4, "sheenColor": "#ffffff", "sheenRoughness": 0.8, "lit": "lightmap"},
   "nespresso_noir": {"color": "#121213", "roughness": 0.25, "clearcoat": 0.7, "clearcoatRoughness": 0.1, "lit": "lightmap"},
   "nespresso_grille": {"color": "#3a3a3c", "metalness": 0.6, "roughness": 0.4, "lit": "lightmap"},
-  "ampoule":        {"color": "#fff8ec", "roughness": 0.1, "emissive": "#ffffff", "lit": "lamp"}
+  "ampoule":        {"color": "#fff8ec", "roughness": 0.1, "emissive": "#ffffff", "lit": "lamp"},
+  "voxtorp":        {"color": "#f2f1ed", "roughness": 0.8, "lit": "lightmap"},
+  "voxtorp_prise":  {"color": "#dcdad4", "roughness": 0.8, "lit": "lightmap"},
+  "hejsta_cadre":   {"color": "#f0efeb", "metalness": 0.25, "roughness": 0.35, "lit": "lightmap"}
 }
