@@ -56,8 +56,16 @@
   <button id="recentrer" title="Recentrer la vue">Recentrer</button>
 
   <div id="amenager" hidden>
-    <p class="nom">Cliquez sur un meuble</p>
-    <p class="astuce">Glissez pour déplacer · Q / E pour tourner</p>
+    <p class="nom">Cliquez sur un meuble (ou choisissez-le dans la liste)</p>
+    <select aria-label="Meuble à déplacer"></select>
+    <p class="astuce">Glissez le meuble pour le déplacer · Q / E pour tourner</p>
+    <div class="rang fleches">
+      <button data-dep="0,-0.1" disabled aria-label="Déplacer vers le haut du plan">&#x2191;</button>
+      <button data-dep="-0.1,0" disabled aria-label="Déplacer vers la gauche">&#x2190;</button>
+      <button data-dep="0.1,0" disabled aria-label="Déplacer vers la droite">&#x2192;</button>
+      <button data-dep="0,0.1" disabled aria-label="Déplacer vers le bas du plan">&#x2193;</button>
+      <span class="astuce">pas de 10 cm</span>
+    </div>
     <div class="rang">
       <button data-rot="15" disabled>&#x21BA; 15°</button>
       <button data-rot="90" disabled>&#x21BA; 90°</button>

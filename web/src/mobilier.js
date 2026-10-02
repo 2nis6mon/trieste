@@ -111,11 +111,13 @@ export class Editeur {
     this.box.material.depthTest = false;
     this.box.renderOrder = 10;
     mob.apt.scene.add(this.box);
+    this.fillList();
     this.bind();
   }
 
   setActif(on) {
     this.actif = on;
+    if (!on) this.dom.style.cursor = '';
     this.panel.hidden = !on;
     if (!on) this.select(null);
     this.dom.classList.toggle('amenager', on);
@@ -133,8 +135,27 @@ export class Editeur {
     const p = id && this.mob.pieces[id];
     this.box.visible = !!p;
     if (p) this.box.setFromObject(p.group);
-    this.panel.querySelector('.nom').textContent = p ? p.def.label : 'Cliquez sur un meuble';
-    this.panel.querySelectorAll('[data-rot]').forEach((b) => (b.disabled = !p));
+    this.panel.querySelector('.nom').textContent = p ? p.def.label : 'Cliquez sur un meuble (ou choisissez-le dans la liste)';
+    this.panel.querySelectorAll('[data-rot], [data-dep]').forEach((b) => (b.disabled = !p));
+    const liste = this.panel.querySelector('select');
+    if (liste) liste.value = id || '';
+  }
+
+  // Déplacement par pas (boutons flèches) : dx, dz en mètres, axes du plan
+  nudge(dx, dz) {
+    const p = this.sel && this.mob.pieces[this.sel];
+    if (!p) return;
+    this.mob.set(p.id, p.x + dx, p.z + dz, p.r);
+    this.box.setFromObject(p.group);
+  }
+
+  fillList() {
+    const liste = this.panel.querySelector('select');
+    if (!liste) return;
+    const noms = { chambre: 'Chambre', sejour: 'Séjour', cuisine: 'Cuisine' };
+    liste.innerHTML = '<option value="">— Choisir un meuble —</option>' + Object.values(this.mob.pieces)
+      .map((p) => `<option value="${p.id}">${noms[p.def.room] || ''} · ${p.def.label}</option>`).join('');
+    liste.addEventListener('change', () => this.select(liste.value || null));
   }
 
   rotate(deg) {
@@ -163,7 +184,13 @@ export class Editeur {
       e.stopImmediatePropagation();
     }, true);
     this.dom.addEventListener('pointermove', (e) => {
+      if (this.actif && !drag && e.pointerType === 'mouse') {
+        // survol : curseur « main » au-dessus d'un meuble
+        const over = this.pick(e).intersectObjects(this.mob.meshes, false).length > 0;
+        this.dom.style.cursor = over ? 'grab' : '';
+      }
       if (!drag || e.pointerId !== drag.pid) return;
+      this.dom.style.cursor = 'grabbing';
       const pt = new THREE.Vector3();
       if (!this.pick(e).ray.intersectPlane(plane, pt)) return;
       const p = this.mob.pieces[drag.id];

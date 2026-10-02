@@ -151,6 +151,10 @@ function setupUI() {
   });
   const pan = document.getElementById('amenager');
   pan.querySelectorAll('[data-rot]').forEach((b) => b.addEventListener('click', () => edit.rotate(+b.dataset.rot)));
+  pan.querySelectorAll('[data-dep]').forEach((b) => b.addEventListener('click', () => {
+    const [dx, dz] = b.dataset.dep.split(',').map(Number);
+    edit.nudge(dx, dz);
+  }));
   pan.querySelector('.reinit').addEventListener('click', () => { mob.reset(); edit.select(edit.sel); });
   pan.querySelector('.copier').addEventListener('click', async () => {
     const txt = JSON.stringify(mob.state(), null, 1);

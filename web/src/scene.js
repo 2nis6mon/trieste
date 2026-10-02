@@ -267,7 +267,8 @@ export class Apartment {
     this.caps.position.y = height + 0.002;
     for (const o of this.meshes) {
       const ud = o.userData;
-      const archi = ud.atlas === 'archi' || ud.lit === 'glass' || /^(murs|faience|fenetre|vitrage|porte|plinthe)/.test(ud.meshName || '');
+      const archi = ud.atlas === 'archi' || ud.lit === 'glass' || /^(murs|faience|fenetre|vitrage|porte|plinthe|tableau|niche)/.test(ud.meshName || '') ||
+        /^(tableau|niche)_/.test(ud.objName || '');
       if (ud.kind === 'plafond' || /^plafon/.test(ud.meshName || '')) { o.visible = !on; continue; }
       if (ud.room === 'exterieur') { o.visible = !on; continue; }
       if (archi) {

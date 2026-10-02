@@ -24,6 +24,12 @@ await p.mouse.down();
 for (let i = 1; i <= 5; i++) { await p.mouse.move(s.x + i * 12, s.y + i * 6); await p.waitForTimeout(200); }
 await p.mouse.up();
 await p.click('#amenager [data-rot="90"]');
+// sélection par la liste et déplacement par flèches
+await p.selectOption('#amenager select', 'canape');
+await p.click('#amenager [data-dep="0.1,0"]');
+await p.click('#amenager [data-dep="0.1,0"]');
+const canape = await p.evaluate(() => window.__visite.mob.pieces.canape.x);
+console.log('canapé déplacé de', canape.toFixed(2), 'm');
 const apres = await p.evaluate(() => {
   const v = window.__visite; const pc = v.mob.pieces.lit;
   return { sel: document.querySelector('#amenager .nom').textContent, x: pc.x, z: pc.z, r: pc.r, etat: v.mob.state() };
