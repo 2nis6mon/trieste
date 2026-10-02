@@ -105,3 +105,20 @@ standard italien 2,10 m (non mesurée).
    au produit.
 9. **Terrasse** : revêtement final inconnu (en chantier sur la vidéo) ;
    dallage gris clair et garde-corps anthracite supposés.
+
+## Mobilier v2 (indications du propriétaire, octobre 2026)
+
+| Élément | Retenu | Source / hypothèse |
+|---|---|---|
+| Placard chambre | PAX 100 + 50 cm, prof. 37 cm, H 236 cm, centré sur son mur, 3 portes TONSTAD blanc cassé 50×229 | Propriétaire ; hauteur 236 (caisson standard) car non précisée |
+| Placard entrée | PAX 3 × 100 cm, prof. 60 cm, H 248 cm (236 + bandeau), collé au retour du mur côté porte palière, 6 portes TONSTAD | Propriétaire |
+| Porte TONSTAD | Blanc cassé, bords arrondis, prise de main intégrée (rainure verticale côté ouverture) | Fiche IKEA (résumé de recherche ; page non consultable depuis l'environnement) |
+| Lampes de chevet | Artemide Eclisse orange, H 18 cm, sphère Ø 12, ouverture tournée vers le lit | Propriétaire ; dimensions catalogue Artemide |
+| Meuble TV | Enfilade vintage bois exotique teinte teck, pieds compas, 2 portes + 2 tiroirs, 164 × 46 × 56 cm | Annonce Côte & Vintage (dimensions via résultats de recherche ; page non consultable) |
+| Télévision | 45 pouces (≈ 99,6 × 56 cm) | Propriétaire |
+| Lampe meuble TV | Artemide Nessino blanche, Ø 32, H 22 cm | Propriétaire ; catalogue |
+| Applique canapé | Artemide Tolomeo Mega murale, structure aluminium (finition inox), diffuseur Ø 36 beige, bras ~80 cm | Propriétaire ; proportions approximées |
+| Tapis de douche | Simeas (La Redoute Intérieurs), coton recyclé tufté, bandes en relief, 50 × 80, coloris écru | Propriétaire ; coloris supposé (écru) |
+| Desserte | Nespresso Inissia noire, 12 × 23 × 32 cm, posée en long sur le plateau haut | Propriétaire |
+| Éclairage | Toutes les sources à 2700 K (balance des blancs d'intérieur 4000 K) | Propriétaire |
+| Pothos du meuble TV | Retiré (place prise par la TV et la Nessino) | Choix d'implantation |

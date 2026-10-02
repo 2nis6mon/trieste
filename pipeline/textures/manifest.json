@@ -315,5 +315,12 @@
    "facade_ouest_nuit"
   ],
   "kind": "facade_emissive"
+ },
+ "simeas": {
+  "size_m": 0.5,
+  "maps": [
+   "simeas",
+   "simeas_n"
+  ]
  }
 }

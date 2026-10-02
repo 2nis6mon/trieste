@@ -21,7 +21,10 @@ export function patchShaders() {
     'vec3 lightMapIrradiance = lightMapTexel.rgb * lightMapIntensity;',
     `vec3 lightMapIrradiance = ( pow( vec3( ${(LOG_K + 1).toFixed(1)} ), lightMapTexel.rgb ) - 1.0 ) * ( lightMapIntensity / ${LOG_K.toFixed(1)} );`
   );
-  c = c.replace('irradiance += lightMapIrradiance;', `iblIrradiance += lightMapIrradiance;
+  c = c.replace('irradiance += lightMapIrradiance;', `#ifdef LM_TINT
+			lightMapIrradiance *= LM_TINT;
+		#endif
+		iblIrradiance += lightMapIrradiance;
 		#if defined( USE_ENVMAP ) && defined( ENVMAP_TYPE_CUBE_UV )
 			float lmL = dot( lightMapIrradiance, vec3( 0.2126, 0.7152, 0.0722 ) );
 			float prL = dot( getIBLIrradiance( geometryNormal ), vec3( 0.2126, 0.7152, 0.0722 ) );

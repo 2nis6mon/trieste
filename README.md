@@ -76,6 +76,8 @@ python build.py scene                           # scène -> pipeline/cache/appar
 SPP=160 python build.py bake jour soir nuit nuit+plafonniers   # ~2 h sur 4 cœurs CPU
 SPP=384 python build.py bake-archi              # architecture seule, sans les meubles déplaçables
 python percer_evier.py                          # perce le plan de travail + export GLB
+python separer_tableaux.py                      # tableaux et niches en temps réel + export
+python meubles_v2.py                            # mobilier v2 (PAX TONSTAD, Artemide, enfilade…) + export
 python build.py export                          # -> web/public/models/appartement.glb
 python build.py preview jour chambre_lit        # rendus Cycles de contrôle
 ```

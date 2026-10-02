@@ -165,12 +165,16 @@ export class Apartment {
       if (!lm) continue;
       m.lightMap = lm.tex;
       m.lightMapIntensity = lm.intensity * Math.PI;
+      // nuit : lampes précalculées en ~3300 K, ramenées à 2700 K
+      if (mode === 'nuit') m.defines = { ...(m.defines || {}), LM_TINT: 'vec3(1.0, 0.78, 0.43)' };
+      else if (m.defines?.LM_TINT) { const { LM_TINT, ...d } = m.defines; m.defines = d; }
       m.needsUpdate = true;
     }
     const night = mode === 'nuit';
     for (const m of this.lib.cache.values()) {
       const n = m.name;
       if (m.userData.lit === 'lamp') {
+        m.emissive.setRGB(1.0, 0.63, 0.25); // 2700 K
         const on = night && (n !== 'plafonnier_diffuseur' || this.ceiling);
         m.emissiveIntensity = on ? (n === 'plafonnier_diffuseur' ? 1.6 : 2.2) : 0.0;
       }

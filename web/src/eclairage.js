@@ -10,10 +10,11 @@ const SUN_COLOR = { jour: [1.0, 0.975, 0.93], soir: [1.0, 0.7, 0.43] };
 // avec les lightmaps) ; calée visuellement sur le précalcul.
 const K_POINT = 1 / (4 * Math.PI);
 const K_AREA = 1 / Math.PI;
-// Hauteur de l'ampoule au-dessus du point d'export (le pied de la lampe)
-const LIFT = { lampadaire_lum: 1.43, lampe_chevet_1_lum: 0.235, lampe_chevet_2_lum: 0.235, lampe_tv_lum: 0.235 };
-// globes opale : une partie de la lumière reste dans le verre
-const GAIN = { lampe_chevet_1_lum: 0.55, lampe_chevet_2_lum: 0.55, lampe_tv_lum: 0.55 };
+// Lampes d'appoint : Eclisse (sphère à ouverture : une partie de la lumière
+// reste dans la coque), Nessino (dôme opale), Tolomeo (diffuseur ouvert)
+const GAIN = { lampe_chevet_1_lum: 0.45, lampe_chevet_2_lum: 0.45, lampe_tv_lum: 0.55 };
+// Toutes les sources : 2700 K (vu avec une balance des blancs d'intérieur à 4000 K)
+export const K2700 = [1.0, 0.63, 0.25];
 
 export class Eclairage {
   constructor(apt) {
@@ -31,7 +32,7 @@ export class Eclairage {
     this.lamps = [];
     for (const l of apt.lamps) {
       let light;
-      const col = new THREE.Color(...l.color);
+      const col = new THREE.Color(...K2700);
       if (l.type === 'POINT') {
         light = new THREE.PointLight(col, l.power * K_POINT * (GAIN[l.name] || 1), 6, 2);
         light.shadow.mapSize.set(512, 512);
@@ -49,7 +50,7 @@ export class Eclairage {
         light.target = tgt;
       }
       light.shadow.camera.near = 0.02; // le globe de la lampe est à quelques cm de l'ampoule
-      light.position.set(l.pos[0], l.pos[1] + (LIFT[l.name] || -0.03), l.pos[2]);
+      light.position.set(l.pos[0], l.pos[1] + (l.type === 'POINT' ? 0 : -0.03), l.pos[2]);
       light.visible = false;
       light.userData = { ...l };
       this.scene.add(light);

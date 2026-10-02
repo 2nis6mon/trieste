@@ -259,6 +259,29 @@ def linen():
     register('lin', 0.12, ['lin', 'lin_n'])
 
 
+
+def simeas():
+    """Tapis de bain Simeas (La Redoute Intérieurs) : coton recyclé tufté écru,
+    bandes graphiques en relief (raccord 50 cm)."""
+    N = 1024
+    size = 0.5
+    y, x = np.mgrid[0:N, 0:N].astype(float) / N  # en fraction du raccord
+    # bandes de 2,5 cm : alternance velours haut / sillon, une bande sur trois en chevrons
+    band = np.floor(y * 20).astype(int)
+    fy = (y * 20) % 1.0
+    h = np.where(fy < 0.78, 1.0, 0.25)
+    chev = (band % 3 == 1)
+    zig = np.abs(((x * 40 + fy * 2.0) % 2.0) - 1.0)  # chevrons
+    h = np.where(chev & (fy < 0.78), 0.55 + 0.45 * (zig > 0.45), h)
+    tuft = spectral_noise(N, N, beta=0.6, seed=181)
+    loops = 0.5 + 0.5 * np.sin(x * 2 * math.pi * 160) * np.sin(y * 2 * math.pi * 160)
+    hh = blur_wrap(h, 1.2) * 0.85 + 0.1 * loops + 0.08 * tuft
+    save('simeas_n', normal_from_height(hh, 3.0), q=90)
+    base = np.array([0.90, 0.86, 0.78])
+    shade = 0.82 + 0.18 * blur_wrap(h, 1.5) + 0.03 * tuft
+    save('simeas', base[None, None] * shade[..., None], q=90)
+    register('simeas', size, ['simeas', 'simeas_n'])
+
 def floral_print():
     """NÅLBJÖRNBÄR (d'après la photo produit IKEA) : semis dense de motifs
     botaniques vert sauge aquarellés (fougères, marguerites, pompons d'ail,
@@ -750,7 +773,7 @@ def ceramic_pot():
 
 
 ALL = dict(parquet=floor_wood, enduit=plaster, bouleau=birch, chene=oak, bambou=bamboo,
-           lin=linen, nalbjornbar=floral_print, canape=sofa_fabric,
+           lin=linen, nalbjornbar=floral_print, simeas=simeas, canape=sofa_fabric,
            tapis_chambre=lambda: knit('tapis_chambre', [0.84, 0.79, 0.70], size=0.35, seed=91, chunky=True),
            tapis_sejour=lambda: knit('tapis_sejour', [0.76, 0.66, 0.52], size=0.25, seed=95, chunky=False),
            plaid=lambda: knit('plaid', [0.80, 0.76, 0.69], size=0.12, seed=97, chunky=False),

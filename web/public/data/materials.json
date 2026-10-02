@@ -87,5 +87,16 @@
   "facade_nord":    {"map": "facade_nord", "uv": "unit", "roughness": 0.9, "emissiveMap": "facade_nord_nuit", "lit": "lightmap"},
   "facade_sud":     {"map": "facade_sud", "uv": "unit", "roughness": 0.9, "emissiveMap": "facade_sud_nuit", "lit": "lightmap"},
   "facade_ouest":   {"map": "facade_ouest", "uv": "unit", "roughness": 0.9, "emissiveMap": "facade_ouest_nuit", "lit": "lightmap"},
-  "toit":           {"color": "#9c5a42", "roughness": 0.85, "lit": "lightmap"}
+  "toit":           {"color": "#9c5a42", "roughness": 0.85, "lit": "lightmap"},
+  "tonstad":        {"color": "#ece7dc", "roughness": 0.55, "lit": "lightmap"},
+  "tonstad_prise":  {"color": "#d3cdbf", "roughness": 0.6, "lit": "lightmap"},
+  "teck":           {"color": "#c88554", "map": "chene", "normalMap": "chene_n", "normalScale": 0.25, "roughness": 0.42, "clearcoat": 0.35, "clearcoatRoughness": 0.3, "size": 0.7, "lit": "lightmap"},
+  "eclisse_orange": {"color": "#e0561c", "roughness": 0.22, "clearcoat": 0.8, "clearcoatRoughness": 0.08, "lit": "lightmap"},
+  "eclisse_interieur": {"color": "#f6efe4", "roughness": 0.5, "emissive": "#ffc58a", "side": "double", "lit": "lamp"},
+  "nessino":        {"color": "#f4f2ee", "roughness": 0.18, "clearcoat": 0.5, "emissive": "#ffd3a0", "lit": "lamp"},
+  "nessino_pied":   {"color": "#f2f0eb", "roughness": 0.2, "clearcoat": 0.5, "lit": "lightmap"},
+  "tolomeo_diffuseur": {"color": "#e3d6bd", "roughness": 0.85, "emissive": "#ffc98e", "side": "double", "lit": "lamp", "sheen": 0.3, "sheenColor": "#ffffff"},
+  "simeas":         {"color": "#ffffff", "map": "simeas", "normalMap": "simeas_n", "normalScale": 1.2, "roughness": 0.97, "size": 0.5, "sheen": 0.4, "sheenColor": "#ffffff", "sheenRoughness": 0.8, "lit": "lightmap"},
+  "nespresso_noir": {"color": "#121213", "roughness": 0.25, "clearcoat": 0.7, "clearcoatRoughness": 0.1, "lit": "lightmap"},
+  "nespresso_grille": {"color": "#3a3a3c", "metalness": 0.6, "roughness": 0.4, "lit": "lightmap"}
 }
