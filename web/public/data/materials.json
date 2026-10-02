@@ -102,5 +102,8 @@
   "ampoule":        {"color": "#fff8ec", "roughness": 0.1, "emissive": "#ffffff", "lit": "lamp"},
   "voxtorp":        {"color": "#f2f1ed", "roughness": 0.8, "lit": "lightmap"},
   "voxtorp_prise":  {"color": "#dcdad4", "roughness": 0.8, "lit": "lightmap"},
-  "hejsta_cadre":   {"color": "#f0efeb", "metalness": 0.25, "roughness": 0.35, "lit": "lightmap"}
+  "hejsta_cadre":   {"color": "#f0efeb", "metalness": 0.25, "roughness": 0.35, "lit": "lightmap"},
+  "lin_ghost":      {"color": "#d9ccb6", "map": "lin", "normalMap": "lin_n", "normalScale": 0.9, "roughness": 0.93, "size": 0.18, "sheen": 0.55, "sheenColor": "#fff6e8", "sheenRoughness": 0.7, "lit": "lightmap"},
+  "kilanda":        {"color": "#f4ecdf", "map": "tissu_canape", "normalMap": "tissu_canape_n", "normalScale": 1.1, "roughness": 0.96, "size": 0.25, "sheen": 0.6, "sheenColor": "#ffffff", "sheenRoughness": 0.7, "lit": "lightmap"},
+  "hetre":          {"color": "#f3dcc0", "map": "bouleau", "normalMap": "bouleau_n", "normalScale": 0.2, "roughness": 0.45, "clearcoat": 0.3, "clearcoatRoughness": 0.35, "size": 0.6, "lit": "lightmap"}
 }

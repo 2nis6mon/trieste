@@ -22,7 +22,7 @@ import bpy  # noqa: E402
 from mathutils import Matrix, Vector  # noqa: E402
 
 import layout as L  # noqa: E402
-from lib import apply_transform, box, cylinder, join, lathe, material, tag, tube  # noqa: E402
+from lib import P, apply_transform, box, cylinder, join, lathe, material, tag, tube  # noqa: E402
 from room_chambre import frame_matrix  # noqa: E402
 
 # 2700 K vu par un appareil réglé sur 4000 K (balance des blancs d'intérieur)
@@ -249,6 +249,85 @@ def nespresso_inissia(name):
     return join(p, name)
 
 
+
+# ------------------------------------------------------------------ séjour : Ghost + EKENÄSET
+SHOWEFY = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'showefy')
+
+
+def ghost_sofa(name='canape'):
+    """Canapé Gervasoni Ghost 13 (fichier OBJ Showefy fourni par le propriétaire,
+    non versionné), housse lin mélangé beige. Local : dos contre le mur (y = 0),
+    façade vers +y, centré en x."""
+    import numpy as np
+    from lib import material as getmat, mesh_obj, smooth_by_angle
+    V, F = [], []
+    for line in open(os.path.join(SHOWEFY, 'GHOST13.obj')):
+        if line.startswith('v '):
+            V.append([float(t) for t in line.split()[1:4]])
+        elif line.startswith('f '):
+            idx = [int(t.split('/')[0]) - 1 for t in line.split()[1:]]
+            for k in range(1, len(idx) - 1):
+                F.append((idx[0], idx[k], idx[k + 1]))
+    V = np.array(V) * 0.001
+    ymax = V[:, 1].max()
+    # fichier : dos vers +y -> on retourne (façade vers +y local) et on plaque le dos au mur
+    V = np.stack([-V[:, 0], ymax - V[:, 1], V[:, 2]], 1)
+    ob = mesh_obj(name, V.tolist(), F)
+    ob.data.materials.append(getmat('lin_ghost'))
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.view_layer.objects.active = ob
+    ob.select_set(True)
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.mesh.remove_doubles(threshold=0.0002)
+    bpy.ops.mesh.normals_make_consistent(inside=False)
+    bpy.ops.uv.cube_project(cube_size=1.0)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    m = ob.modifiers.new('decimer', 'DECIMATE')
+    m.ratio = 0.4
+    bpy.ops.object.modifier_apply(modifier=m.name)
+    smooth_by_angle(ob, 60)
+    ob.select_set(False)
+    return ob
+
+
+def ekenaset(name='fauteuil'):
+    """Fauteuil IKEA EKENÄSET, Kilanda beige clair : structure hêtre massif,
+    accoudoirs plats, coussins d'assise et de dossier rembourrés (simulés).
+    L 64 x P 78 x H 76 ; assise H 45, accoudoirs H 63, dégagement sous assise 22.
+    Local : centré en x, façade vers +y, z vers le haut."""
+    import cloth
+    W, Dp = 0.64, 0.78
+    p = []
+    bv = 0.007
+    xa = W / 2 - 0.03                                   # axe des montants
+    for sx in (-1, 1):
+        x = sx * xa
+        # pied avant, légèrement fuselé (section 38 -> 30 mm)
+        p.append(cylinder('pied_av', 0.017, 0.0, 0.612, 6, 'hetre', cx=x, cy=0.30, r_top=0.019, bevel=0.003))
+        # montant arrière incliné (pied + support de dossier)
+        p.append(tube('montant_ar', [(x, -0.27, 0.0), (x, -0.31, 0.40), (x, -0.375, 0.74)], 0.017, 10, 'hetre'))
+        # accoudoir plat, débord avant arrondi
+        p.append(box('accoudoir', x - 0.026, -0.36, 0.612, x + 0.026, 0.355, 0.637, 'hetre', bevel=0.01, seg=3, grain='y'))
+        # longeron d'assise
+        p.append(box('longeron', x - 0.013, -0.29, 0.22, x + 0.013, 0.30, 0.30, 'hetre', bevel=bv, grain='y'))
+    p.append(box('traverse_av', -xa, 0.285, 0.22, xa, 0.31, 0.30, 'hetre', bevel=bv))
+    p.append(box('traverse_ar', -xa, -0.30, 0.22, xa, -0.275, 0.30, 'hetre', bevel=bv))
+    p.append(box('traverse_haut', -xa, -0.39, 0.70, xa, -0.365, 0.735, 'hetre', bevel=bv))
+    # sangles sous l'assise (visibles de près)
+    for k in range(4):
+        y = -0.22 + k * 0.15
+        p.append(box('sangle', -xa + 0.01, y - 0.025, 0.285, xa - 0.01, y + 0.025, 0.29, 'caoutchouc'))
+    frame = join(p, name)
+    seat = cloth.pillow(name + '_assise', 0.56, 0.54, thick=0.13, cell=0.018, pressure=4.5, frames=30, mat='kilanda', bending=6.0)
+    seat.matrix_world = Matrix.Translation((0, 0.02, 0.375))
+    apply_transform(seat)
+    back = cloth.pillow(name + '_dossier', 0.56, 0.46, thick=0.12, cell=0.018, pressure=4.0, frames=30, mat='kilanda', bending=6.0)
+    back.matrix_world = Matrix.Translation((0, -0.29, 0.54)) @ Matrix.Rotation(math.radians(-76), 4, 'X')
+    apply_transform(back)
+    return frame, seat, back
+
+
 # ------------------------------------------------------------------ cuisine
 def cuisine_v2():
     """Reconstruit les caissons et façades (mêmes emplacements que room_cuisine.build)."""
@@ -262,6 +341,16 @@ def cuisine_v2():
              (fB, 'four', RC.oven_unit(), sk - 0.60), (fB, 'etroit', RC.narrow_unit(), sk - 0.80),
              (fB, 'evier_meuble', RC.drawers_unit(0.60, 'evier_meuble', 2), sk - 1.40)]
     for fr, name, parts, s0 in items:
+        if name == 'evier_meuble':
+            # caisson sous évier ouvert en haut (la cuve y descend) : joues, fond, dos
+            car = [o for o in parts if o.name.startswith('evier_meuble_caisson')][0]
+            parts.remove(car)
+            bpy.data.objects.remove(car)
+            parts += [box('evier_joue_g', 0.0, 0.0, 0.08, 0.018, RC.D - 0.002, RC.TOP, 'caisson_cuisine'),
+                      box('evier_joue_d', 0.582, 0.0, 0.08, 0.60, RC.D - 0.002, RC.TOP, 'caisson_cuisine'),
+                      box('evier_fond', 0.018, 0.0, 0.08, 0.582, RC.D - 0.002, 0.098, 'caisson_cuisine'),
+                      box('evier_dos', 0.018, 0.0, 0.098, 0.582, 0.008, RC.TOP, 'caisson_cuisine'),
+                      box('evier_traverse', 0.018, RC.D - 0.08, RC.TOP - 0.018, 0.582, RC.D - 0.002, RC.TOP, 'caisson_cuisine')]
         place_all(parts, frame_matrix(fr, s0, 0.0))
         tag(join(parts, name), room='cuisine', collide=True, lit='probe', label='Cuisine (VOXTORP)')
     fil = box('fileur', 0.0, 0.0, 0.08, sw - 1.20, RC.D + 0.019, RC.TOP, 'voxtorp')
@@ -370,6 +459,22 @@ def main():
     place([ns], frame_matrix(niche, 0.09, 0.03) @ Matrix.Translation((0.2525, 0.15, 0.752))
           @ Matrix.Rotation(math.pi / 2, 4, 'Z'))
     tag(ns, room='cuisine', lit='probe', collide=False)
+    # --- canapé Ghost 13 (lin mélangé beige) à la place du canapé-lit, centré sur son mur
+    remove('canape', 'coussin_canape_0', 'coussin_canape_1', 'plaid')
+    fr = RS.MUR_CANAPE
+    gs = ghost_sofa('canape')
+    place([gs], frame_matrix(fr, (fr.length) / 2, 0.02))
+    tag(gs, room='sejour', collide=True, lit='probe', label='Canapé Ghost 13 (Gervasoni), lin beige')
+    # --- fauteuil EKENÄSET dans l'angle de la fenêtre, tourné vers le salon
+    remove('fauteuil', 'fauteuil_assise', 'fauteuil_dossier')
+    fa, fs, fb = ekenaset('fauteuil')
+    cx, cz = 7.22, 10.33
+    ang = math.atan2(-(4.6 - cx), -(9.3 - cz))  # façade (+y local) vers le coin salon
+    Mf = Matrix.Translation(P(cx, cz)) @ Matrix.Rotation(ang, 4, 'Z')
+    place([fa, fs, fb], Mf)
+    tag(fa, room='sejour', collide=True, lit='probe', label='Fauteuil EKENÄSET Kilanda beige clair')
+    for o in (fs, fb):
+        tag(o, room='sejour', collide=False, lit='probe')
     # --- séjour : olivier retiré (demande du propriétaire)
     remove('olivier_pot', 'olivier_feuillage', 'terreau_olivier', 'pot_olivier')
     # --- cuisine : façades VOXTORP sans poignée, portes vitrées HEJSTA

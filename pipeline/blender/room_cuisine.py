@@ -41,25 +41,18 @@ def plinth_and_carcass(w, name):
 
 
 def front(x0, x1, z0, z1, name, handle='top', glass=False):
-    """Façade VOXTORP blanc mat, sans poignée : prise de main intégrée = creux
-    fraisé dans le chant (en haut pour les éléments bas, en bas pour les hauts)."""
+    """Façade VOXTORP blanc mat, sans poignée : prise de main intégrée = rainure
+    sur toute la largeur du chant (en haut pour les éléments bas, en bas pour
+    les éléments muraux), jeu de 3 mm entre façades."""
     y0, y1 = D, D + 0.019
     g = 0.0015
-    hw = min(0.36, (x1 - x0) * 0.62)          # largeur de la prise
-    cx = (x0 + x1) / 2
-    gh, gd = 0.032, 0.013                      # hauteur et profondeur du creux
+    gh, gd = 0.028, 0.012                      # hauteur et profondeur de la rainure
     if handle in ('top', 'left', 'right'):
-        zs0, zs1 = z1 - g - gh, z1 - g        # bande de prise en haut
-        body = (z0 + g, zs0)
+        body, grip = (z0 + g, z1 - g - gh), (z1 - g - gh, z1 - g)
     else:
-        zs0, zs1 = z0 + g, z0 + g + gh
-        body = (zs1, z1 - g)
-    parts = [box(name, x0 + g, y0, body[0], x1 - g, y1, body[1], 'voxtorp', bevel=0.0015, grain='z'),
-             box(name + '_pg', x0 + g, y0, zs0, cx - hw / 2, y1, zs1, 'voxtorp', bevel=0.0015),
-             box(name + '_pd', cx + hw / 2, y0, zs0, x1 - g, y1, zs1, 'voxtorp', bevel=0.0015),
-             # fond du creux (en retrait), légèrement plus sombre (ombre portée de la prise)
-             box(name + '_prise', cx - hw / 2, y0, zs0, cx + hw / 2, y1 - gd, zs1, 'voxtorp_prise', bevel=0.004)]
-    return parts
+        body, grip = (z0 + g + gh, z1 - g), (z0 + g, z0 + g + gh)
+    return [box(name, x0 + g, y0, body[0], x1 - g, y1, body[1], 'voxtorp', bevel=0.0012, grain='z'),
+            box(name + '_prise', x0 + g, y0, grip[0], x1 - g, y1 - gd, grip[1], 'voxtorp_prise', bevel=0.002)]
 
 
 def fridge(w=0.60):

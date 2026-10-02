@@ -56,13 +56,10 @@
    ]
   },
   "canape": {
-   "label": "Canapé-lit",
+   "label": "Canapé Ghost 13, lin mélangé beige",
    "room": "sejour",
    "objets": [
-    "canape",
-    "coussin_canape_0",
-    "coussin_canape_1",
-    "plaid"
+    "canape"
    ]
   },
   "table": {
@@ -153,6 +150,15 @@
    "objets": [
     "nissafors",
     "nespresso"
+   ]
+  },
+  "fauteuil": {
+   "label": "Fauteuil EKENÄSET Kilanda beige clair",
+   "room": "sejour",
+   "objets": [
+    "fauteuil",
+    "fauteuil_assise",
+    "fauteuil_dossier"
    ]
   }
  },

@@ -126,5 +126,10 @@ standard italien 2,10 m (non mesurée).
 | Façades cuisine | IKEA VOXTORP blanc mat sans poignée : prise de main creusée dans le chant (en haut des éléments bas, en bas des éléments muraux) | Propriétaire ; fiche IKEA via résultats de recherche |
 | Portes vitrées (meuble haut droit) | IKEA HEJSTA : cadre aluminium laqué blanc fin, verre trempé clair, poignée verticale intégrée ; 2 portes superposées 60 × 40 conservées (le lien indique 40 × 60) | Propriétaire ; à confirmer |
 | Olivier du séjour | Retiré | Propriétaire |
+| Canapé | Gervasoni Ghost 13 (géométrie Showefy fournie, 188 × 105), housse lin mélangé beige, centré sur son mur ; remplace le canapé-lit (coussins déco et plaid retirés) | Propriétaire ; fichier sous copyright Showefy, non versionné |
+| Fauteuil | IKEA EKENÄSET, Kilanda beige clair : 64 × 78 × 76, assise 45, accoudoirs 63, hêtre massif ; dans l'angle de la fenêtre, tourné vers le salon | Propriétaire ; dimensions IKEA (résultats de recherche) |
+| Caisson sous évier | Ouvert en haut (passage de la cuve), 2 façades VOXTORP | Correction |
 
 Les fichiers .3ds Artemide (téléchargements fabricant fournis par le propriétaire) ne sont pas versionnés : `pipeline/assets/artemide/` (voir `.gitignore`). Le lecteur `pipeline/blender/lire_3ds.py` les importe.
+
+Le fichier du canapé Ghost (`GHOST13.obj`, © Showefy / lunghezzadonda srl, reproduction et diffusion interdites sans autorisation) est gardé hors du dépôt : `pipeline/assets/showefy/`.

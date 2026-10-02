@@ -21,7 +21,7 @@ cut = bpy.context.active_object
 # caisson sous évier : on dégage la place de la cuve (Ø 42, profondeur 18 cm)
 bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=0.214, depth=0.42, location=(cx, cy, zt - 0.1))
 cut2 = bpy.context.active_object
-for ob, c in ((wt, cut), (bpy.data.objects['evier_meuble'], cut2)):
+for ob, c in ((wt, cut),):  # le caisson sous évier est construit ouvert (meubles_v2)
     m = ob.modifiers.new('trou_evier', 'BOOLEAN')
     m.operation = 'DIFFERENCE'
     m.object = c
